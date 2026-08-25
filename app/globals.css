@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-primary: #4338CA;
+  --color-brand-accent: #14B8A6;
+  --font-brand: var(--font-space-grotesk);
+  --font-code: var(--font-jetbrains-mono);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  body {
+    @apply bg-[#F8FAFC] text-[#1E293B];
+  }
+  
+  html.dark body {
+    @apply bg-[#0B1120] text-[#E2E8F0];
+  }
+}
+
