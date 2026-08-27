@@ -74,6 +74,47 @@ function ActivityBars({ botId, messageCount }: { botId: string, messageCount: nu
   );
 }
 
+function PipelineTracker({ progress, pct }: { progress: UploadEvent | null, pct: number }) {
+  if (!progress) return null;
+  const steps = [
+    { id: 'parsing', label: 'Extracting Text & Chunking' },
+    { id: 'embedding', label: 'Generating Embeddings' },
+    { id: 'done', label: 'Finalizing Bot' }
+  ];
+  
+  const currentStepIdx = progress.stage === 'done' ? 2 : steps.findIndex(s => s.id === progress.stage);
+  const activeIdx = currentStepIdx === -1 ? 0 : currentStepIdx;
+  
+  return (
+    <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/30 transition-colors">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Processing Document Pipeline</h3>
+        <span className="text-xs font-mono font-medium text-brand-primary">{pct}%</span>
+      </div>
+      <div className="space-y-3">
+        {steps.map((step, idx) => {
+          const isPast = activeIdx > idx || progress.stage === 'done';
+          const isCurrent = activeIdx === idx && progress.stage !== 'done';
+          
+          return (
+            <div key={step.id} className="flex items-center gap-3">
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${isPast ? 'bg-green-500 text-white' : isCurrent ? 'bg-brand-primary text-white shadow-[0_0_10px_rgba(67,56,202,0.5)]' : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>
+                {isPast ? '✓' : idx + 1}
+              </div>
+              <span className={`text-sm font-medium ${isPast ? 'text-gray-900 dark:text-gray-200' : isCurrent ? 'text-brand-primary dark:text-brand-accent' : 'text-gray-400 dark:text-gray-500'}`}>
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-5">
+        <div className="h-full bg-brand-primary dark:bg-brand-accent transition-all duration-300 rounded-full" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
 const IconUpload = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8 text-gray-400 dark:text-gray-500">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -104,6 +145,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
   const [progress, setProgress] = useState<UploadEvent | null>(null);
   const [pct, setPct] = useState(0);
   const [result, setResult] = useState<{ botId: string; snippet: string; chunks: number } | null>(null);
@@ -133,6 +175,41 @@ export default function Dashboard() {
   };
 
   useEffect(() => { if (user) fetchBots(); }, [user]);
+
+  useEffect(() => {
+    let dragCounter = 0;
+    const handleDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter++;
+      setIsDraggingGlobal(true);
+    };
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter === 0) setIsDraggingGlobal(false);
+    };
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter = 0;
+      setIsDraggingGlobal(false);
+      if (e.dataTransfer?.files?.length) {
+        setFiles(prev => [...prev, ...Array.from(e.dataTransfer!.files)]);
+      }
+    };
+    const handleDragOver = (e: DragEvent) => e.preventDefault();
+
+    window.addEventListener("dragenter", handleDragEnter);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragenter", handleDragEnter);
+      window.removeEventListener("dragleave", handleDragLeave);
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); }, []);
   const onDragLeave = useCallback(() => setIsDragging(false), []);
@@ -238,7 +315,16 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="font-sans min-h-full">
+    <div className="font-sans min-h-full relative">
+      {/* Global Drag Overlay */}
+      {isDraggingGlobal && (
+        <div className="fixed inset-0 z-50 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-sm m-4 rounded-3xl border-4 border-dashed border-brand-primary flex flex-col items-center justify-center text-brand-primary dark:text-brand-accent pointer-events-none transition-all">
+          <IconUpload />
+          <h2 className="text-2xl font-bold mt-4">Drop files anywhere to upload</h2>
+          <p className="text-sm font-medium opacity-80 mt-2">We'll automatically start processing them.</p>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto px-8 py-16 space-y-10">
         
         {/* Header */}
@@ -319,19 +405,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {loading && (
-            <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-brand-primary/5 dark:bg-brand-primary/10 transition-colors">
-              <div className="flex justify-between text-xs font-medium text-brand-primary dark:text-brand-accent mb-2">
-                <span>
-                  {progress?.stage === "parsing" && `Parsing ${progress.filename}...`}
-                  {progress?.stage === "embedding" && `Embedding ${progress.filename}...`}
-                </span>
-                <span>{pct}%</span>
-              </div>
-              <div className="h-1.5 w-full bg-brand-primary/20 dark:bg-gray-800 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-primary dark:bg-brand-accent transition-all duration-300 rounded-full" style={{ width: `${pct}%` }} />
-              </div>
-            </div>
+          {loading && progress && (
+            <PipelineTracker progress={progress} pct={pct} />
           )}
 
           {error && (
