@@ -16,6 +16,8 @@ export interface BotRecord {
   createdAt: number;
   themeColor: string;
   avatarUrl: string;
+  messageCount?: number;
+  lastActive?: number;
 }
 
 export interface ChatSession {
@@ -191,6 +193,15 @@ export async function trackChatSession(
       await redis.zadd(`sessions:${botId}`, { score: now, member: sessionId });
       // Add to the global sessions index
       await redis.zadd("sessions_index", { score: now, member: sessionId });
+    }
+    
+    // Update bot aggregate stats (fire-and-forget from the route, so this won't block)
+    const botKey = `bot_record:${botId}`;
+    const bot = await redis.get<BotRecord>(botKey);
+    if (bot) {
+      bot.messageCount = (bot.messageCount || 0) + 1;
+      bot.lastActive = now;
+      await redis.set(botKey, bot);
     }
   } else {
     const existing = inMemorySessions.find(s => s.sessionId === sessionId);

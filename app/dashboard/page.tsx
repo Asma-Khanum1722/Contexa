@@ -24,6 +24,8 @@ interface BotRecord {
   createdAt: number;
   themeColor: string;
   avatarUrl: string;
+  messageCount?: number;
+  lastActive?: number;
 }
 
 const IconUpload = () => (
@@ -335,8 +337,16 @@ export default function Dashboard() {
                 <div key={bot.botId} className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start mb-3">
-                      <div className="w-10 h-10 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-brand-accent flex items-center justify-center">
-                        <IconBot />
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-brand-accent flex items-center justify-center">
+                          <IconBot />
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-full border border-gray-100 dark:border-gray-700">
+                          <span className={`w-2 h-2 rounded-full ${bot.lastActive ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></span>
+                          <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {bot.lastActive ? timeAgo(bot.lastActive) : "Never active"}
+                          </span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => deleteBot(bot.botId)} 
@@ -348,7 +358,7 @@ export default function Dashboard() {
                     </div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">{bot.name}</h3>
                     <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">
-                      {bot.chunks} chunks · {timeAgo(bot.createdAt)}
+                      {bot.chunks} chunks · {bot.messageCount || 0} messages
                     </p>
                     {bot.filenames?.length > 0 && (
                       <p className="text-xs text-gray-400 dark:text-gray-500 truncate" title={bot.filenames.join(", ")}>
