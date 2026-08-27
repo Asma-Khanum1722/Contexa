@@ -99,7 +99,16 @@ export default function Dashboard() {
   const removeFile = (i: number) => setFiles(prev => prev.filter((_, idx) => idx !== i));
 
   async function handleUpload() {
-    if (!files.length) return;
+    if (!files.length) {
+      setError("Please select at least one file to upload.");
+      return;
+    }
+    const totalSize = files.reduce((acc, f) => acc + f.size, 0);
+    if (totalSize > 25 * 1024 * 1024) {
+      setError("Total file size exceeds the 25MB limit. Please remove some files.");
+      return;
+    }
+    
     setLoading(true); setError(null); setResult(null); setProgress(null); setPct(0);
 
     const form = new FormData();

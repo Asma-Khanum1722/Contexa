@@ -105,7 +105,7 @@ export default function UsersCRMPage() {
         {/* Header */}
         <div className="px-10 py-8 flex justify-between items-end sticky top-0 z-10 bg-gray-50/90 dark:bg-[#0B1120]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Users & CRM</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Chat Logs</h1>
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
               Last updated {timeAgo(lastRefresh)} ·{" "}
               <button onClick={fetchData} className="text-brand-primary dark:text-brand-accent hover:underline">Refresh</button>

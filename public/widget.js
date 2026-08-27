@@ -348,6 +348,7 @@
   // ─── Minimal markdown renderer ────────────────────────────────────────────────
   function renderMarkdown(text) {
     return text
+      .replace(/\[(?:Source\s*)?\d+\]/g, '') // Strip inline citations like [1] or [Source 1]
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`)
       .replace(/`([^`]+)`/g, "<code>$1</code>")
@@ -494,7 +495,11 @@
 
       if (!res.ok || !res.body) {
         const d = await res.json().catch(() => ({}));
-        appendMessage(d.error || `Error ${res.status}`, "error");
+        let errMsg = d.error || `Error ${res.status}`;
+        if (res.status === 429) {
+          errMsg = "I'm getting a lot of questions right now, try again shortly";
+        }
+        appendMessage(errMsg, "error");
         return;
       }
 

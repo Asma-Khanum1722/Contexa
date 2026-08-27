@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { href: "/dashboard", label: "My Bots", icon: <Bot size={20} /> },
-    { href: "/dashboard/users", label: "Users & CRM", icon: <Users size={20} /> },
+    { href: "/dashboard/users", label: "Chat Logs", icon: <Users size={20} /> },
     { href: "/dashboard/settings", label: "Settings", icon: <Settings size={20} /> },
   ];
 
@@ -89,8 +89,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               )}
               <div className="overflow-hidden">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-200 leading-none mb-1 truncate">{user.displayName || "User"}</p>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-200 leading-none mb-1 truncate">{user.email?.includes('gmail.com') ? "Contexa Admin" : (user.displayName || "User")}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{user.email?.includes('gmail.com') ? "hello@contexa.ai" : user.email}</p>
               </div>
             </div>
             <button 
