@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
+import { CommandPalette } from "@/components/CommandPalette";
 
 import { Bot, Users, Settings } from "lucide-react";
 
@@ -104,9 +105,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative bg-gray-50 dark:bg-[#0B1120] transition-colors duration-200">
+      <main className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-[#0B1120] transition-colors duration-200 shadow-inner">
         {children}
       </main>
+      <CommandPalette />
     </div>
   );
 }
