@@ -176,63 +176,71 @@ export default function UsersCRMPage() {
         <div className="p-10 space-y-8 max-w-6xl">
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-6">
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
-              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                Total Sessions
+            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200/80 dark:border-gray-800 rounded-2xl shadow-sm transition-all hover:shadow-md">
+              <div className="flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                <span>Total Sessions</span>
+                <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
               </div>
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-16"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
-                  <Sparkline data={sparklineData} colorClass="text-gray-900 dark:text-white" />
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
+                  <Sparkline data={sparklineData} colorClass="text-indigo-500" />
                 </div>
               )}
-              <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Unique chat sessions</div>
+              <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Unique user chat sessions</div>
             </div>
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
-              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                Active Now
+            
+            <div className="p-6 bg-white dark:bg-[#0F172A] border border-emerald-200/60 dark:border-emerald-900/40 rounded-2xl shadow-sm transition-all hover:shadow-md bg-gradient-to-b from-emerald-50/10 to-transparent dark:from-emerald-950/10">
+              <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">
+                <span>Active Now</span>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
               </div>
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-12"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-semibold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
-                  {stats.activeSessions > 0 && <span className="flex h-3 w-3"><span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-brand-primary opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-brand-primary"></span></span>}
+                  <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.activeSessions}</div>
+                  <Sparkline data={sparklineData} colorClass="text-emerald-500" />
                 </div>
               )}
-              <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Active in last 5 mins</div>
+              <div className="text-xs font-medium text-emerald-600/70 dark:text-emerald-400/70 mt-2">Active in last 5 mins</div>
             </div>
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
-              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                Avg Messages
+
+            <div className="p-6 bg-white dark:bg-[#0F172A] border border-purple-200/60 dark:border-purple-900/40 rounded-2xl shadow-sm transition-all hover:shadow-md bg-gradient-to-b from-purple-50/10 to-transparent dark:from-purple-950/10">
+              <div className="flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-2">
+                <span>Avg Messages</span>
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
               </div>
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-14"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.avgMessages}</div>
+                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.avgMessages}</div>
                 </div>
               )}
-              <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Messages per session</div>
+              <div className="text-xs font-medium text-purple-600/70 dark:text-purple-400/70 mt-2">Messages per session</div>
             </div>
           </div>
 
           {/* Search & Table */}
           <div className="space-y-4">
-            <div className="relative w-72">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <div className="relative w-80">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               <input 
                 type="text" 
-                placeholder="Search sessions..." 
+                placeholder="Search by IP, bot name, browser..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-white dark:bg-[#1E293B] transition-all shadow-sm"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 bg-white dark:bg-[#1E293B] transition-all shadow-sm"
               />
             </div>
 
-            <div className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden transition-colors">
+            <div className="bg-white dark:bg-[#0F172A] border border-gray-200/80 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
               {loading ? (
                 <div className="w-full">
                   {[1, 2, 3].map(i => (
@@ -246,72 +254,86 @@ export default function UsersCRMPage() {
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="p-12 flex flex-col items-center gap-3 text-center">
-                  <svg className="w-10 h-10 text-gray-200 dark:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-500">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                  </div>
                   <div>
-                    <p className="text-gray-600 dark:text-gray-300 font-semibold text-sm">No sessions yet</p>
-                    <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Sessions will appear here when users interact with your embedded bots.</p>
+                    <p className="text-gray-800 dark:text-gray-200 font-bold text-sm">No sessions recorded yet</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Sessions will appear here automatically when users chat with your bots.</p>
                   </div>
                 </div>
               ) : (
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
-                      <th className="py-4 px-6 font-medium">Session</th>
-                      <th className="py-4 px-6 font-medium">Bot</th>
-                      <th className="py-4 px-6 font-medium">Status</th>
-                      <th className="py-4 px-6 font-medium">Messages</th>
-                      <th className="py-4 px-6 font-medium">Duration</th>
-                      <th className="py-4 px-6 font-medium text-right">Last Active</th>
+                    <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/40 text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                      <th className="py-4 px-6 font-semibold">User Session</th>
+                      <th className="py-4 px-6 font-semibold">Target Bot</th>
+                      <th className="py-4 px-6 font-semibold">Live Status</th>
+                      <th className="py-4 px-6 font-semibold">Messages</th>
+                      <th className="py-4 px-6 font-semibold">Duration</th>
+                      <th className="py-4 px-6 font-semibold text-right">Last Active</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                    {filtered.map((session) => (
-                      <tr key={session.sessionId} className="bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-default">
-                        <td className="py-4 px-6">
-                          <div className="font-semibold text-gray-900 dark:text-gray-200 font-mono text-xs">{maskIp(session.ip)}</div>
-                          <div className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">{getBrowserName(session.userAgent)}</div>
-                        </td>
-                        <td className="py-4 px-6">
-                          {botsMap[session.botId] ? (
-                            <span className="text-xs font-semibold text-gray-900 dark:text-gray-200">
-                              {botsMap[session.botId]}
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800/80">
+                    {filtered.map((session) => {
+                      const browser = getBrowserName(session.userAgent);
+                      return (
+                        <tr key={session.sessionId} className="bg-white dark:bg-[#0F172A] hover:bg-indigo-50/20 dark:hover:bg-indigo-950/20 transition-colors cursor-default">
+                          <td className="py-4 px-6">
+                            <div className="font-semibold text-gray-900 dark:text-gray-100 font-mono text-xs">{maskIp(session.ip)}</div>
+                            <div className="mt-1">
+                              <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                browser === "Chrome" ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border-sky-200/60 dark:border-sky-800/40" :
+                                browser === "Firefox" ? "bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 border-orange-200/60 dark:border-orange-800/40" :
+                                browser === "Safari" ? "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200/60 dark:border-indigo-800/40" :
+                                "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700"
+                              }`}>
+                                {browser}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            {botsMap[session.botId] ? (
+                              <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40">
+                                🤖 {botsMap[session.botId]}
+                              </span>
+                            ) : (
+                              <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-md">{session.botId.slice(0, 8)}...</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6">
+                            {isActive(session) ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                                Active
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mr-1.5"></span>
+                                Idle
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/40">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                              {session.messageCount}
                             </span>
-                          ) : (
-                            <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">{session.botId.slice(0, 8)}...</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6">
-                          {isActive(session) ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                              Active
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600 mr-1.5"></span>
-                              Idle
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-gray-200">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-brand-primary dark:text-brand-accent"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            {session.messageCount}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-gray-500 dark:text-gray-400 text-xs font-medium">
-                          {formatDuration(session.startedAt, session.lastSeenAt)}
-                        </td>
-                        <td className="py-4 px-6 font-medium text-gray-400 dark:text-gray-500 text-right text-xs">
-                          {timeAgo(session.lastSeenAt)}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="py-4 px-6 text-gray-600 dark:text-gray-300 text-xs font-medium">
+                            {formatDuration(session.startedAt, session.lastSeenAt)}
+                          </td>
+                          <td className="py-4 px-6 font-medium text-gray-400 dark:text-gray-500 text-right text-xs">
+                            {timeAgo(session.lastSeenAt)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
-              <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors">
-                <span>{filtered.length} session{filtered.length !== 1 ? "s" : ""}</span>
+              <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors">
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{filtered.length} session{filtered.length !== 1 ? "s" : ""} recorded</span>
                 <span className="text-gray-400 dark:text-gray-500">Auto-refreshes every 30s</span>
               </div>
             </div>

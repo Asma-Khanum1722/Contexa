@@ -56,21 +56,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <ThemeToggle />
           </div>
           
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            <div className="px-3 mb-2 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Overview</div>
+          <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
+            <div className="px-3 mb-2 flex items-center justify-between text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              <span>Overview</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40">
+                PRO
+              </span>
+            </div>
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive 
-                      ? "bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-brand-accent" 
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent text-indigo-600 dark:text-indigo-300 font-semibold border-l-2 border-indigo-600 dark:border-indigo-400 shadow-sm" 
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
                 >
-                  <div className={`${isActive ? "text-brand-primary dark:text-brand-accent" : "text-gray-400 dark:text-gray-500"}`}>
+                  <div className={`transition-colors ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-gray-400 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"}`}>
                     {item.icon}
                   </div>
                   {item.label}
@@ -81,26 +86,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           {/* Bottom actions */}
           <div className="p-4 flex flex-col gap-3 shrink-0 border-t border-gray-100 dark:border-gray-800">
-            <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 transition-colors flex flex-col gap-3">
+            <div className="p-3.5 rounded-xl bg-gradient-to-b from-gray-50 to-indigo-50/20 dark:from-gray-800/40 dark:to-indigo-950/20 border border-gray-200/60 dark:border-gray-700/50 transition-colors flex flex-col gap-3 shadow-sm">
               <div className="flex items-center gap-3">
                 {user.photoURL ? (
-                  <img src={user.photoURL} alt="Avatar" className="w-9 h-9 rounded-full object-cover shadow-sm border border-white dark:border-gray-700" />
+                  <img src={user.photoURL} alt="Avatar" className="w-9 h-9 rounded-full object-cover shadow-sm border border-indigo-200 dark:border-indigo-800/60" />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-primary to-blue-500 flex items-center justify-center text-white text-sm font-semibold shadow-sm border border-white dark:border-gray-700">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-indigo-500/20 border border-white/20">
                     {userInitials}
                   </div>
                 )}
-                <div className="overflow-hidden">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-200 leading-none mb-1 truncate">{user.displayName || "User"}</p>
+                <div className="overflow-hidden flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-none mb-1 truncate">{user.displayName || "User"}</p>
+                  </div>
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                 </div>
               </div>
-              <button 
-                onClick={logout}
-                className="w-full text-left text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors py-1.5 px-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Sign Out
-              </button>
+              <div className="flex items-center justify-between pt-1 border-t border-gray-200/40 dark:border-gray-700/40">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+                </span>
+                <button 
+                  onClick={logout}
+                  className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors py-1 px-2 rounded-md hover:bg-red-50 dark:hover:bg-red-950/30"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
         </aside>

@@ -60,19 +60,24 @@ function CountUp({ value }: { value: number }) {
 function PipelineTracker({ progress, pct }: { progress: UploadEvent | null, pct: number }) {
   if (!progress) return null;
   const steps = [
-    { id: 'parsing', label: 'Extracting Text & Chunking' },
-    { id: 'embedding', label: 'Generating Embeddings' },
-    { id: 'done', label: 'Finalizing Bot' }
+    { id: 'parsing', label: 'Extracting Text & Chunking', color: 'sky' },
+    { id: 'embedding', label: 'Generating Embeddings (768d)', color: 'indigo' },
+    { id: 'done', label: 'Vector Indexing & Ready', color: 'emerald' }
   ];
   
   const currentStepIdx = progress.stage === 'done' ? 2 : steps.findIndex(s => s.id === progress.stage);
   const activeIdx = currentStepIdx === -1 ? 0 : currentStepIdx;
   
   return (
-    <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/30 transition-colors">
+    <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gradient-to-b from-indigo-50/20 to-transparent dark:from-indigo-950/20 dark:to-transparent transition-colors">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Processing Document Pipeline</h3>
-        <span className="text-xs font-mono font-medium text-brand-primary">{pct}%</span>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          Processing Knowledge Pipeline
+        </h3>
+        <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200/50 dark:border-indigo-800/40">
+          {pct}%
+        </span>
       </div>
       <div className="space-y-3">
         {steps.map((step, idx) => {
@@ -81,18 +86,30 @@ function PipelineTracker({ progress, pct }: { progress: UploadEvent | null, pct:
           
           return (
             <div key={step.id} className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${isPast ? 'bg-green-500 text-white' : isCurrent ? 'bg-brand-primary text-white shadow-[0_0_10px_rgba(67,56,202,0.5)]' : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                isPast 
+                  ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30' 
+                  : isCurrent 
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/40 animate-pulse' 
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
+              }`}>
                 {isPast ? '✓' : idx + 1}
               </div>
-              <span className={`text-sm font-medium ${isPast ? 'text-gray-900 dark:text-gray-200' : isCurrent ? 'text-brand-primary dark:text-brand-accent' : 'text-gray-400 dark:text-gray-500'}`}>
+              <span className={`text-sm font-medium transition-colors ${
+                isPast 
+                  ? 'text-gray-900 dark:text-gray-200' 
+                  : isCurrent 
+                    ? 'text-indigo-600 dark:text-indigo-400 font-semibold' 
+                    : 'text-gray-400 dark:text-gray-500'
+              }`}>
                 {step.label}
               </span>
             </div>
           );
         })}
       </div>
-      <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-5">
-        <div className="h-full bg-brand-primary dark:bg-brand-accent transition-all duration-300 rounded-full" style={{ width: `${pct}%` }} />
+      <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-5">
+        <div className="h-full bg-gradient-to-r from-sky-500 via-indigo-600 to-emerald-500 transition-all duration-300 rounded-full" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
@@ -308,49 +325,85 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-8 py-16 space-y-10">
+      <div className="max-w-4xl mx-auto px-8 py-12 space-y-10">
         
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white transition-colors">
-            Create a new Chatbot
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium transition-colors">
-            Upload PDFs, scanned images, or text documents to generate an embedded AI agent instantly.
-          </p>
+        {/* Header with quick stats */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                RAG Engine Online
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-mono text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/50 dark:border-purple-800/40">
+                Gemini 2.0
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white transition-colors">
+              Create a new Chatbot
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium transition-colors">
+              Upload documents or knowledge bases to generate an intelligent assistant.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#0F172A] border border-gray-200/80 dark:border-gray-800 shadow-sm flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                <strong className="text-gray-900 dark:text-white font-semibold">{bots.length}</strong> {bots.length === 1 ? 'Bot' : 'Bots'} Active
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Upload Card */}
-        <div className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#0F172A] border border-gray-200/80 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
           <div 
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`p-12 m-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 border-2 border-dashed rounded-xl ${
+            className={`p-10 m-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 border-2 border-dashed rounded-xl ${
               isDragging 
-                ? 'bg-brand-primary/5 border-brand-primary text-brand-primary dark:bg-brand-primary/10' 
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                ? 'bg-gradient-to-b from-indigo-50/50 to-purple-50/30 dark:from-indigo-950/40 dark:to-purple-950/20 border-indigo-500 text-indigo-600 shadow-inner' 
+                : 'border-gray-200 dark:border-gray-700/80 hover:border-indigo-400/60 dark:hover:border-indigo-500/40 hover:bg-gradient-to-b hover:from-indigo-50/15 hover:to-transparent dark:hover:from-indigo-950/20'
             }`}
           >
-            <div className={`mb-4 p-3 rounded-full ${isDragging ? 'bg-brand-primary/10' : 'bg-gray-50 dark:bg-gray-800'}`}>
+            <div className={`mb-4 p-3.5 rounded-2xl transition-transform duration-200 hover:scale-105 ${
+              isDragging 
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' 
+                : 'bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-teal-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-sm'
+            }`}>
               <IconUpload />
             </div>
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1">Click to upload or drag and drop</h2>
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">PDF, PNG, JPG or TXT (max. 25MB)</p>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
+              Click to upload or drag and drop
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Upload your reference knowledge base files (up to 25MB each)
+            </p>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border border-sky-200/50 dark:border-sky-800/40">PDF</span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-800/40">TXT</span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/40">PNG/JPG</span>
+            </div>
             <input ref={fileInputRef} type="file" multiple onChange={onFileChange} accept=".pdf,.png,.jpg,.jpeg,.webp,.txt" className="hidden" />
           </div>
 
           {files.length > 0 && (
             <div className="px-6 pb-4">
-              <div className="border border-gray-100 dark:border-gray-800 rounded-xl divide-y divide-gray-100 dark:divide-gray-800 overflow-hidden">
+              <div className="border border-gray-200/60 dark:border-gray-800 rounded-xl divide-y divide-gray-100 dark:divide-gray-800 overflow-hidden shadow-sm">
                 {files.map((file, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <div key={i} className="flex items-center justify-between p-3.5 bg-gray-50/70 dark:bg-gray-800/40 hover:bg-indigo-50/30 dark:hover:bg-gray-800 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-800/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm">
                         <IconFile />
                       </div>
-                      <span className="font-medium text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+                      <div>
+                        <span className="font-medium text-sm text-gray-800 dark:text-gray-200">{file.name}</span>
+                        <p className="text-[11px] text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+                      </div>
                     </div>
                     <button onClick={(e) => { e.stopPropagation(); removeFile(i); }} className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                       <IconTrash />
@@ -361,22 +414,22 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#0F172A] mt-2 transition-colors">
+          <div className="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/40 dark:bg-[#0F172A] mt-2 transition-colors">
             <div className="flex-1 mt-4">
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Bot Name (Optional)</label>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5 ml-1">Bot Name (Optional)</label>
               <input 
                 type="text" 
                 value={botName}
                 onChange={e => setBotName(e.target.value)}
-                placeholder="e.g. Acme Inc. Sales Bot"
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-white dark:bg-[#1E293B] transition-all shadow-sm"
+                placeholder="e.g. Acme Support AI"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 bg-white dark:bg-[#1E293B] transition-all shadow-sm"
               />
             </div>
             <div className="flex items-end mt-4">
               <button 
                 onClick={handleUpload}
                 disabled={loading || files.length === 0}
-                className="w-full sm:w-auto bg-brand-primary text-white px-8 py-2.5 rounded-lg font-medium text-sm hover:bg-brand-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm border border-transparent dark:border-indigo-400/30 dark:shadow-[0_0_15px_rgba(67,56,202,0.2)] flex items-center justify-center gap-2 h-[42px]"
+                className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white px-8 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/25 border border-indigo-400/20 flex items-center justify-center gap-2 h-[42px] cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -393,24 +446,27 @@ export default function Dashboard() {
           )}
 
           {error && (
-            <div className="p-6 border-t border-red-100 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium text-sm rounded-b-2xl transition-colors">
-              ⚠ {error}
+            <div className="p-6 border-t border-red-100 dark:border-red-900/50 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium text-sm rounded-b-2xl transition-colors flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+              <span>{error}</span>
             </div>
           )}
         </div>
 
         {/* Result Card */}
         {result && (
-          <div className="bg-white dark:bg-[#0F172A] border border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-colors">
-            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 rounded-l-2xl"></div>
+          <div className="bg-white dark:bg-[#0F172A] border border-emerald-300 dark:border-emerald-800/60 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-colors">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500 rounded-l-2xl"></div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">
               <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
               Bot Successfully Created
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-4">ID: {result.botId} · {result.chunks} data chunks embedded</p>
-            <div className="bg-gray-900 dark:bg-black/50 border dark:border-gray-800 rounded-xl p-4">
-              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">Embed Code</p>
-              <div className="font-code text-sm text-green-400 overflow-x-auto whitespace-pre-wrap break-all">
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-4">ID: <span className="font-mono text-indigo-600 dark:text-indigo-400">{result.botId}</span> · {result.chunks} data chunks embedded</p>
+            <div className="bg-gray-900 dark:bg-black/60 border border-gray-800 rounded-xl p-4 shadow-inner">
+              <p className="text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Embed Code Ready
+              </p>
+              <div className="font-code text-sm text-emerald-300 overflow-x-auto whitespace-pre-wrap break-all">
                 {result.snippet}
               </div>
             </div>
@@ -420,7 +476,12 @@ export default function Dashboard() {
         {/* Bots List */}
         <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors">Your Bots</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors flex items-center gap-2">
+              <span>Your Knowledge Bots</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40">
+                {bots.length}
+              </span>
+            </h2>
           </div>
           
           {botsLoading && (
@@ -439,60 +500,66 @@ export default function Dashboard() {
           )}
           
           {!botsLoading && bots.length === 0 && (
-            <div className="bg-white dark:bg-[#0F172A] border border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-10 text-center transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mx-auto mb-3 text-gray-400 dark:text-gray-500">
+            <div className="bg-white dark:bg-[#0F172A] border border-dashed border-gray-200 dark:border-gray-700/80 rounded-2xl p-12 text-center transition-colors">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-teal-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-3.5 text-indigo-600 dark:text-indigo-400 shadow-sm">
                 <IconBot />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">No bots yet. Upload your first document above to get started.</p>
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">No bots created yet</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Upload your first document above to get started with an automated AI agent.</p>
             </div>
           )}
 
           {bots.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {bots.map((bot, i) => (
                 <div 
                   key={bot.botId} 
-                  className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col justify-between animate-fade-slide-up hover:-translate-y-[2px]"
+                  className="bg-white dark:bg-[#0F172A] border border-gray-200/80 dark:border-gray-800/90 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:shadow-indigo-500/5 transition-all group flex flex-col justify-between animate-fade-slide-up hover:-translate-y-[2px]"
                   style={{ animationFillMode: "both", animationDelay: `${i * 50}ms` }}
                 >
                   <div>
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-brand-accent flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/15 via-purple-500/10 to-pink-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-sm">
                           <IconBot />
                         </div>
-                        <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/50 px-2 py-1 rounded-full border border-gray-100 dark:border-gray-700">
-                          <span className={`w-2 h-2 rounded-full ${bot.lastActive ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></span>
-                          <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {bot.lastActive ? timeAgo(bot.lastActive) : "Never active"}
+                        <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/40">
+                          <span className={`w-1.5 h-1.5 rounded-full ${bot.lastActive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400 dark:bg-gray-500'}`}></span>
+                          <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                            {bot.lastActive ? timeAgo(bot.lastActive) : "Active"}
                           </span>
                         </div>
                       </div>
                       <button 
                         onClick={() => deleteBot(bot.botId)} 
-                        className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all p-1"
+                        className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
                         title="Delete bot"
                       >
                         <IconTrash />
                       </button>
                     </div>
-                    <div className="flex items-end justify-between mb-1 mt-3">
+                    <div className="flex items-end justify-between mb-2 mt-4">
                       <div>
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">{bot.name}</h3>
-                        <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
-                          <CountUp value={bot.chunks} /> chunks · <CountUp value={bot.messageCount || 0} /> messages
-                        </p>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate mb-1.5">{bot.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/40">
+                            <CountUp value={bot.chunks} /> chunks
+                          </span>
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/40">
+                            <CountUp value={bot.messageCount || 0} /> messages
+                          </span>
+                        </div>
                       </div>
                     </div>
                     {bot.filenames?.length > 0 && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate" title={bot.filenames.join(", ")}>
+                      <p className="text-xs font-medium text-gray-400 dark:text-gray-500 truncate mt-2" title={bot.filenames.join(", ")}>
                         📄 {bot.filenames.join(", ")}
                       </p>
                     )}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex gap-2">
-                    <Link href={`/dashboard/bot/${bot.botId}`} className="flex-1 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-center py-2 rounded-lg font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-brand-accent hover:border-brand-primary/30 dark:hover:border-brand-primary/30 transition-colors shadow-sm">
-                      Configure →
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/80 flex gap-2">
+                    <Link href={`/dashboard/bot/${bot.botId}`} className="flex-1 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-center py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 hover:text-indigo-600 dark:hover:text-indigo-300 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-sm">
+                      Configure & Preview →
                     </Link>
                   </div>
                 </div>
