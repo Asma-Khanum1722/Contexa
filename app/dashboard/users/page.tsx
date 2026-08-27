@@ -91,14 +91,25 @@ export default function UsersCRMPage() {
   const [search, setSearch] = useState("");
   const [lastRefresh, setLastRefresh] = useState(Date.now());
 
+  const [botsMap, setBotsMap] = useState<Record<string, string>>({});
+
   const fetchData = useCallback(async () => {
     try {
       const token = await auth.currentUser?.getIdToken();
       if (!token) return;
-      const res = await fetch("/api/sessions", {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+      const [res, botsRes] = await Promise.all([
+        fetch("/api/sessions", { headers: { "Authorization": `Bearer ${token}` } }),
+        fetch("/api/bots", { headers: { "Authorization": `Bearer ${token}` } })
+      ]);
       const data = await res.json();
+      const botsData = await botsRes.json();
+      
+      const map: Record<string, string> = {};
+      if (botsData.bots) {
+        botsData.bots.forEach((b: any) => { map[b.id] = b.name; });
+      }
+      setBotsMap(map);
+
       setSessions(data.sessions || []);
       setStats(data.stats || { totalSessions: 0, activeSessions: 0, avgMessages: 0 });
       setLastRefresh(Date.now());
@@ -261,7 +272,13 @@ export default function UsersCRMPage() {
                           <div className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">{getBrowserName(session.userAgent)}</div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">{session.botId.slice(0, 8)}...</span>
+                          {botsMap[session.botId] ? (
+                            <span className="text-xs font-semibold text-gray-900 dark:text-gray-200">
+                              {botsMap[session.botId]}
+                            </span>
+                          ) : (
+                            <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded">{session.botId.slice(0, 8)}...</span>
+                          )}
                         </td>
                         <td className="py-4 px-6">
                           {isActive(session) ? (
