@@ -356,7 +356,7 @@
   // ─── Minimal markdown renderer ────────────────────────────────────────────────
   function renderMarkdown(text) {
     return text
-      .replace(/\[(?:Source\s*)?\d+\]/g, '') // Strip inline citations like [1] or [Source 1]
+      .replace(/\[(?:Source\s*)?[\d,\s]+\]/g, '') // Strip inline citations like [1] or [1, 2]
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) => `<pre><code>${code.trim()}</code></pre>`)
       .replace(/`([^`]+)`/g, "<code>$1</code>")
