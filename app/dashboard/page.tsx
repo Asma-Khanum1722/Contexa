@@ -344,10 +344,22 @@ export default function Dashboard() {
         <div className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors">Your Bots</h2>
-            {botsLoading && (
-              <svg className="animate-spin h-4 w-4 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            )}
           </div>
+          
+          {botsLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-gray-800/50 rounded-xl p-5 shadow-sm h-[180px] flex flex-col justify-between">
+                  <div>
+                    <div className="w-10 h-10 rounded-lg animate-shimmer mb-3"></div>
+                    <div className="w-3/4 h-5 rounded-md animate-shimmer mb-2"></div>
+                    <div className="w-1/2 h-4 rounded-md animate-shimmer"></div>
+                  </div>
+                  <div className="w-full h-9 rounded-lg animate-shimmer mt-4"></div>
+                </div>
+              ))}
+            </div>
+          )}
           
           {!botsLoading && bots.length === 0 && (
             <div className="bg-white dark:bg-[#0F172A] border border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-10 text-center transition-colors">

@@ -127,7 +127,7 @@ export default function UsersCRMPage() {
                 Total Sessions
               </div>
               {loading ? (
-                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse w-16"></div>
+                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-16"></div>
               ) : (
                 <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
               )}
@@ -138,7 +138,7 @@ export default function UsersCRMPage() {
                 Active Now
               </div>
               {loading ? (
-                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse w-12"></div>
+                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-12"></div>
               ) : (
                 <div className="text-3xl font-semibold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
               )}
@@ -149,7 +149,7 @@ export default function UsersCRMPage() {
                 Avg Messages
               </div>
               {loading ? (
-                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse w-14"></div>
+                <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-14"></div>
               ) : (
                 <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.avgMessages}</div>
               )}
@@ -172,9 +172,15 @@ export default function UsersCRMPage() {
 
             <div className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden transition-colors">
               {loading ? (
-                <div className="p-10 flex flex-col items-center gap-3">
-                  <svg className="animate-spin h-6 w-6 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">Loading sessions...</p>
+                <div className="w-full">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center gap-6 px-6 py-4 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                      <div className="h-8 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer"></div>
+                      <div className="h-6 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer"></div>
+                      <div className="h-6 w-16 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer"></div>
+                      <div className="h-6 w-12 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer ml-auto"></div>
+                    </div>
+                  ))}
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="p-12 flex flex-col items-center gap-3 text-center">
