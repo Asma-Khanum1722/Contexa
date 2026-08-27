@@ -37,7 +37,6 @@ export function CommandPalette() {
   const actions = [
     { id: "home", title: "Go to Dashboard", href: "/dashboard" },
     { id: "logs", title: "View Chat Logs", href: "/dashboard/users" },
-    { id: "settings", title: "Account Settings", href: "/dashboard/settings" },
   ];
 
   const filtered = actions.filter((a) =>

@@ -8,8 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { CommandPalette } from "@/components/CommandPalette";
-
-import { Bot, Users, Settings } from "lucide-react";
+import { Bot, Users } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +36,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { href: "/dashboard", label: "My Bots", icon: <Bot size={20} /> },
     { href: "/dashboard/users", label: "Chat Logs", icon: <Users size={20} /> },
-    { href: "/dashboard/settings", label: "Settings", icon: <Settings size={20} /> },
   ];
 
   const userInitials = user.displayName 
