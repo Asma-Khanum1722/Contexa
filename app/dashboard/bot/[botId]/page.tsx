@@ -227,23 +227,33 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
             <div>
               <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Avatar Image</label>
               <div className="flex items-center gap-4">
-                {config.avatarUrl ? (
-                  <img src={config.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm shrink-0" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center shrink-0 transition-colors">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  </div>
-                )}
-                <div className="flex flex-col items-start gap-1">
-                  <label className={`cursor-pointer bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm inline-flex items-center ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-                    {uploading ? "Uploading…" : "Upload Image"}
-                    <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                  </label>
-                  {config.avatarUrl && (
-                    <button onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-1 pt-1">
-                      Remove
-                    </button>
+                <label className={`relative group cursor-pointer w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center shrink-0 transition-all ${config.avatarUrl ? 'border-transparent' : 'border-gray-300 dark:border-gray-600 hover:border-brand-primary dark:hover:border-brand-accent hover:bg-brand-primary/5 dark:hover:bg-brand-accent/5'} ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                  <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                  {config.avatarUrl ? (
+                    <>
+                      <img src={config.avatarUrl} alt="Avatar" className="w-full h-full rounded-full object-cover shadow-sm" />
+                      <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 5v14M5 12h14"/></svg>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500 group-hover:text-brand-primary dark:group-hover:text-brand-accent transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center bg-white/80 dark:bg-[#0F172A]/80 transition-opacity">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary dark:text-brand-accent"><path d="M12 5v14M5 12h14"/></svg>
+                      </div>
+                    </>
                   )}
+                </label>
+                <div className="flex flex-col items-start gap-1">
+                  {config.avatarUrl ? (
+                    <button onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-1 pt-1">
+                      Remove photo
+                    </button>
+                  ) : (
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Click to upload avatar</span>
+                  )}
+                  {uploading && <span className="text-xs font-medium text-brand-primary">Uploading…</span>}
                 </div>
               </div>
             </div>
