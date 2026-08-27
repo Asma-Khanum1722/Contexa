@@ -127,7 +127,7 @@
 
     #sb-panel {
       position: fixed; bottom: 92px; right: 24px;
-      width: 376px; height: 540px;
+      width: 376px; max-height: min(540px, calc(100vh - 120px));
       background: var(--sb-panel-bg);
       border: 1px solid var(--sb-border);
       border-radius: 20px;
@@ -332,9 +332,10 @@
     }
 
     @media (max-width: 420px) {
-      #sb-panel { width: calc(100vw - 20px); right: 10px; bottom: 84px; }
-      #sb-bubble { right: 10px; bottom: 10px; }
-      #sb-tooltip { right: 10px; bottom: 84px; }
+      #sb-panel { width: calc(100vw - 16px); right: 8px; bottom: 76px; max-height: calc(100vh - 90px); border-radius: 16px; }
+      #sb-bubble { right: 12px; bottom: 12px; width: 50px; height: 50px; }
+      #sb-bubble-img { width: 50px; height: 50px; }
+      #sb-tooltip { right: 12px; bottom: 76px; max-width: calc(100vw - 80px); font-size: 12.5px; }
     }
   `;
   }
@@ -378,7 +379,7 @@
   // ─── Build tooltip ────────────────────────────────────────────────────────────
   const tooltip = document.createElement("div");
   tooltip.id = "sb-tooltip";
-  tooltip.textContent = "👋 Hi! Ask me anything about our docs.";
+  tooltip.textContent = "👋 Ask me anything, I'm here to help!";
 
   // ─── Build avatar for header ──────────────────────────────────────────────────
   const headerAvatarHtml = botConfig.avatarUrl
@@ -483,7 +484,7 @@
   let historyRestored = false;
   function restoreHistory() {
     if (history.length === 0) {
-      appendMessage("👋 Hi! I'm trained on your documents — ask me anything!", "bot");
+      appendMessage("👋 Hi! I'm here to help. Ask me anything!", "bot");
     } else {
       history.forEach(m => appendMessage(m.text, m.role, m.sources));
     }
