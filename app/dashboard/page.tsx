@@ -333,8 +333,12 @@ export default function Dashboard() {
 
           {bots.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {bots.map(bot => (
-                <div key={bot.botId} className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
+              {bots.map((bot, i) => (
+                <div 
+                  key={bot.botId} 
+                  className="bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col justify-between animate-fade-slide-up hover:-translate-y-[2px]"
+                  style={{ animationFillMode: "both", animationDelay: `${i * 50}ms` }}
+                >
                   <div>
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-3">

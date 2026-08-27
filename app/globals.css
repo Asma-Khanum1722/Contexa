@@ -23,4 +23,21 @@
     @apply bg-[#0B1120] text-[#E2E8F0];
   }
 }
+}
 
+@layer utilities {
+  @keyframes fade-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide-up {
+    animation: fade-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
