@@ -60,9 +60,11 @@ const isBuildPhase =
 if (typeof window === "undefined" && !isBuildPhase) validate();
 
 export function env(key: RequiredEnvKey): string {
-  return process.env[key] as string;
+  const val = process.env[key] as string;
+  return val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '') : val;
 }
 
 export function optionalEnv(key: OptionalEnvKey): string | undefined {
-  return process.env[key];
+  const val = process.env[key];
+  return val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '') : val;
 }
