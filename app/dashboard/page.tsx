@@ -28,6 +28,33 @@ interface BotRecord {
   lastActive?: number;
 }
 
+function CountUp({ value }: { value: number }) {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let startTime: number;
+    let animationFrameId: number;
+    const duration = 500; // ms
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const pct = Math.min(progress / duration, 1);
+      const easeOut = 1 - Math.pow(1 - pct, 3);
+      setCount(Math.floor(easeOut * value));
+      
+      if (progress < duration) {
+        animationFrameId = requestAnimationFrame(step);
+      }
+    };
+    
+    animationFrameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [value]);
+
+  return <span>{count}</span>;
+}
+
 const IconUpload = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8 text-gray-400 dark:text-gray-500">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -362,7 +389,7 @@ export default function Dashboard() {
                     </div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">{bot.name}</h3>
                     <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">
-                      {bot.chunks} chunks · {bot.messageCount || 0} messages
+                      <CountUp value={bot.chunks} /> chunks · <CountUp value={bot.messageCount || 0} /> messages
                     </p>
                     {bot.filenames?.length > 0 && (
                       <p className="text-xs text-gray-400 dark:text-gray-500 truncate" title={bot.filenames.join(", ")}>
