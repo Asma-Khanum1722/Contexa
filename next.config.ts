@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     "tesseract.js",
     "canvas",
     "pdfjs-dist",
-    "firebase-admin",
   ],
 
   // Mark 'canvas' as optional — it's a peer dep for scanned PDF OCR.
