@@ -257,14 +257,14 @@
     }
     .sb-typing span {
       width: 6px; height: 6px; border-radius: 50%;
-      background: var(--sb-primary); opacity: 0.5;
-      animation: sb-bounce 1.2s ease-in-out infinite;
+      background: var(--sb-primary); opacity: 0.3;
+      animation: sb-pulse-scale 1.2s ease-in-out infinite;
     }
     .sb-typing span:nth-child(2) { animation-delay: 0.15s; }
     .sb-typing span:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes sb-bounce {
-      0%,80%,100% { transform: translateY(0); opacity: 0.4; }
-      40% { transform: translateY(-4px); opacity: 1; }
+    @keyframes sb-pulse-scale {
+      0%, 100% { transform: scale(0.8); opacity: 0.3; }
+      50% { transform: scale(1.2); opacity: 1; }
     }
 
     /* Cursor */
