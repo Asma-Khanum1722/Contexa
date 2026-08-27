@@ -55,6 +55,25 @@ function CountUp({ value }: { value: number }) {
   return <span>{count}</span>;
 }
 
+function ActivityBars({ botId, messageCount }: { botId: string, messageCount: number }) {
+  // Deterministic faux data based on botId and messageCount to give a realistic active feel
+  const seed = botId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const data = Array.from({ length: 7 }, (_, i) => {
+    if (messageCount === 0) return 2; // base flatline
+    return Math.max(2, Math.floor((Math.sin(seed + i) + 1) * 10) + (i === 6 && messageCount > 0 ? 15 : 0));
+  });
+
+  return (
+    <div className="flex items-end gap-1 h-6">
+      {data.map((val, i) => (
+        <div key={i} className="w-1.5 bg-brand-primary/20 dark:bg-brand-accent/20 rounded-t-sm relative group overflow-hidden" style={{ height: `${val}px` }}>
+          <div className="absolute bottom-0 left-0 w-full bg-brand-primary dark:bg-brand-accent transition-all duration-300" style={{ height: i === 6 && messageCount > 0 ? '100%' : '50%' }}></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const IconUpload = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8 text-gray-400 dark:text-gray-500">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -399,10 +418,15 @@ export default function Dashboard() {
                         <IconTrash />
                       </button>
                     </div>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">{bot.name}</h3>
-                    <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">
-                      <CountUp value={bot.chunks} /> chunks · <CountUp value={bot.messageCount || 0} /> messages
-                    </p>
+                    <div className="flex items-end justify-between mb-1 mt-3">
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">{bot.name}</h3>
+                        <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+                          <CountUp value={bot.chunks} /> chunks · <CountUp value={bot.messageCount || 0} /> messages
+                        </p>
+                      </div>
+                      <ActivityBars botId={bot.botId} messageCount={bot.messageCount || 0} />
+                    </div>
                     {bot.filenames?.length > 0 && (
                       <p className="text-xs text-gray-400 dark:text-gray-500 truncate" title={bot.filenames.join(", ")}>
                         📄 {bot.filenames.join(", ")}
