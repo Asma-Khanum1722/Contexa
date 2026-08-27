@@ -185,12 +185,20 @@
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    @keyframes sb-pop-in {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
 
     .sb-msg-wrap {
       display: flex; flex-direction: column; gap: 4px;
       animation: sb-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    .sb-msg-wrap.user { align-items: flex-end; }
+    .sb-msg-wrap.user { 
+      align-items: flex-end; 
+      transform-origin: bottom right;
+      animation: sb-pop-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
     .sb-msg-wrap.bot  { align-items: flex-start; }
 
     .sb-msg {
