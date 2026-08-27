@@ -13,7 +13,7 @@ function getAdminApp(): App {
         // In production, you would want to use a service account key here.
         // For now, initializing with just the projectId allows verifyIdToken to work
         // by fetching the public keys for the project.
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.replace(/^"|"$/g, ""),
       });
     }
   }

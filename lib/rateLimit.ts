@@ -21,8 +21,8 @@ async function getUpstashRatelimit() {
     const { Redis } = await import("@upstash/redis");
 
     const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      url: process.env.UPSTASH_REDIS_REST_URL!.replace(/^"|"$/g, ""),
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!.replace(/^"|"$/g, ""),
     });
 
     _ratelimitInstance = { Ratelimit, redis };
