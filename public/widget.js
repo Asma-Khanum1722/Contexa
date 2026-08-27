@@ -127,7 +127,7 @@
 
     #sb-panel {
       position: fixed; bottom: 92px; right: 24px;
-      width: 376px; max-height: min(540px, calc(100vh - 120px));
+      width: 376px; height: 540px; max-height: calc(100vh - 120px);
       background: var(--sb-panel-bg);
       border: 1px solid var(--sb-border);
       border-radius: 20px;
@@ -439,7 +439,7 @@
   const closeBtn   = shadow.getElementById("sb-close");
 
   // ─── Rendering ────────────────────────────────────────────────────────────────
-  function appendMessage(text, role, sources) {
+  function appendMessage(text, role) {
     const wrap = document.createElement("div");
     wrap.className = `sb-msg-wrap ${role}`;
     const el = document.createElement("div");
@@ -447,23 +447,6 @@
     el.innerHTML = role === "bot" ? renderMarkdown(text) : "";
     if (role !== "bot") el.textContent = text;
     wrap.appendChild(el);
-
-    if (sources && sources.length > 0) {
-      const tog = document.createElement("div");
-      tog.className = "sb-sources-toggle";
-      tog.innerHTML = `<span>Sources (${sources.length})</span><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>`;
-      const chips = document.createElement("div");
-      chips.className = "sb-sources sb-collapsed";
-      sources.forEach(s => {
-        const c = document.createElement("span");
-        c.className = "sb-source-chip";
-        c.textContent = `[${s.id}] ${s.filename || "source"}`;
-        chips.appendChild(c);
-      });
-      tog.onclick = () => { chips.classList.toggle("sb-collapsed"); tog.classList.toggle("sb-open"); setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 50); };
-      wrap.appendChild(tog);
-      wrap.appendChild(chips);
-    }
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return el;
@@ -545,22 +528,8 @@
               msgEl.appendChild(cursor);
               messagesEl.scrollTop = messagesEl.scrollHeight;
             } else if (ev.type === "done") {
-              sources = ev.sources || [];
               cursor.remove();
               msgEl.innerHTML = renderMarkdown(fullText);
-              if (sources.length > 0) {
-                const tog = document.createElement("div");
-                tog.className = "sb-sources-toggle";
-                tog.innerHTML = `<span>Sources (${sources.length})</span><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>`;
-                const chips = document.createElement("div");
-                chips.className = "sb-sources sb-collapsed";
-                sources.forEach(s => {
-                  const c = document.createElement("span"); c.className = "sb-source-chip";
-                  c.textContent = `[${s.id}] ${s.filename || "source"}`; chips.appendChild(c);
-                });
-                tog.onclick = () => { chips.classList.toggle("sb-collapsed"); tog.classList.toggle("sb-open"); setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 50); };
-                wrap.appendChild(tog); wrap.appendChild(chips);
-              }
             } else if (ev.type === "error") {
               cursor.remove(); msgEl.className = "sb-msg error"; msgEl.textContent = ev.error || "Something went wrong.";
             }
