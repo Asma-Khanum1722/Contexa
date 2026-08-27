@@ -30,7 +30,7 @@ type OptionalEnvKey = (typeof OPTIONAL)[number];
 function validate(): void {
   const missing = REQUIRED.filter((k) => !process.env[k]);
   if (missing.length > 0) {
-    throw new Error(
+    console.error(
       `[Contexa] Missing required environment variables:\n  ${missing.join("\n  ")}\n` +
         `Copy .env.local.example to .env.local and fill in the values.`
     );
