@@ -127,7 +127,7 @@
 
     #sb-panel {
       position: fixed; bottom: 92px; right: 24px;
-      width: 376px; height: 540px; max-height: calc(100vh - 120px);
+      width: 376px; height: 540px; max-height: calc(100% - 110px);
       background: var(--sb-panel-bg);
       border: 1px solid var(--sb-border);
       border-radius: 20px;
