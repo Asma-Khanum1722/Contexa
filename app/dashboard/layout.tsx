@@ -107,7 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-[#0B1120] transition-colors duration-200 shadow-inner">
+      <main className={`flex-1 flex flex-col bg-gray-50/50 dark:bg-[#0B1120] transition-colors duration-200 shadow-inner ${isBotSettings ? "overflow-hidden" : "overflow-y-auto"}`}>
         {children}
       </main>
       <CommandPalette />

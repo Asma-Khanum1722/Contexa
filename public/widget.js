@@ -127,7 +127,8 @@
 
     #sb-panel {
       position: fixed; bottom: 92px; right: 24px;
-      width: 376px; height: 540px; max-height: calc(100% - 110px);
+      width: 376px; max-width: calc(100% - 48px);
+      height: 540px; max-height: calc(100% - 116px);
       background: var(--sb-panel-bg);
       border: 1px solid var(--sb-border);
       border-radius: 20px;
@@ -140,6 +141,17 @@
       transform: translateY(16px) scale(0.96);
       transform-origin: bottom right;
       transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+    }
+    
+    @media (max-width: 480px) {
+      #sb-panel {
+        right: 16px; bottom: 84px;
+        max-width: calc(100% - 32px);
+        max-height: calc(100% - 100px);
+      }
+      #sb-bubble {
+        right: 16px; bottom: 16px;
+      }
     }
     #sb-panel.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
 

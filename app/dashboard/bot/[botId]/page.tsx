@@ -162,9 +162,9 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
   };
 
   return (
-    <div className="flex h-full font-sans overflow-hidden transition-colors duration-200">
+    <div className="flex h-full w-full font-sans overflow-hidden transition-colors duration-200">
       {/* Left Pane - Settings Container */}
-      <div className="w-[520px] bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800 flex relative z-10 shadow-sm transition-colors duration-200">
+      <div className="w-[520px] bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800 flex relative z-10 shadow-sm transition-colors duration-200 overflow-hidden">
         
         {/* Sub-nav */}
         <div className="w-40 border-r border-gray-100 dark:border-gray-800 flex flex-col pt-6 bg-gray-50/50 dark:bg-[#0B1120]/50 shrink-0">
