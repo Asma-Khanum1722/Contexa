@@ -157,9 +157,10 @@ export default function UsersCRMPage() {
       {/* Main Area */}
       <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Header */}
-        <div className="px-10 py-8 flex justify-between items-end sticky top-0 z-10 bg-gray-50/90 dark:bg-[#0B1120]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
+        {/* Header */}
+        <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sticky top-0 z-10 bg-gray-50/90 dark:bg-[#0B1120]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Chat Logs</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Chat Logs</h1>
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
               Last updated {timeAgo(lastRefresh)} ·{" "}
               <button onClick={fetchData} className="text-brand-primary dark:text-brand-accent hover:underline">Refresh</button>
@@ -173,10 +174,10 @@ export default function UsersCRMPage() {
           </div>
         </div>
 
-        <div className="p-10 space-y-8 max-w-6xl">
+        <div className="p-4 sm:px-6 md:p-10 space-y-6 sm:space-y-8 max-w-6xl">
           {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+            <div className="p-5 sm:p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Total Sessions
               </div>
@@ -184,14 +185,14 @@ export default function UsersCRMPage() {
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-16"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
                   <Sparkline data={sparklineData} colorClass="text-gray-900 dark:text-white" />
                 </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Unique user chat sessions</div>
             </div>
             
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
+            <div className="p-5 sm:p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Active Now
               </div>
@@ -199,14 +200,14 @@ export default function UsersCRMPage() {
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-12"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
                   <Sparkline data={sparklineData} colorClass="text-brand-primary dark:text-brand-accent" />
                 </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Active in last 5 mins</div>
             </div>
 
-            <div className="p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
+            <div className="p-5 sm:p-6 bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm transition-colors">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Avg Messages
               </div>
@@ -214,7 +215,7 @@ export default function UsersCRMPage() {
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-14"></div>
               ) : (
                 <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.avgMessages}</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.avgMessages}</div>
                 </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Messages per session</div>
@@ -223,7 +224,7 @@ export default function UsersCRMPage() {
 
           {/* Search & Table */}
           <div className="space-y-4">
-            <div className="relative w-80">
+            <div className="relative w-full sm:w-80">
               <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               <input 
                 type="text" 
@@ -257,7 +258,8 @@ export default function UsersCRMPage() {
                   </div>
                 </div>
               ) : (
-                <table className="w-full text-left text-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm min-w-[600px]">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                       <th className="py-4 px-6 font-medium">User Session</th>
@@ -315,10 +317,11 @@ export default function UsersCRMPage() {
                       );
                     })}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               )}
               <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors">
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{filtered.length} session{filtered.length !== 1 ? "s" : ""} recorded</span>
+                <span className="font-semibold text-brand-primary dark:text-brand-accent">{filtered.length} session{filtered.length !== 1 ? "s" : ""} recorded</span>
                 <span className="text-gray-400 dark:text-gray-500">Auto-refreshes every 30s</span>
               </div>
             </div>
@@ -326,8 +329,8 @@ export default function UsersCRMPage() {
         </div>
       </div>
 
-      {/* Right Side Panel */}
-      <div className="w-72 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-y-auto shadow-[-4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[-4px_0_24px_rgba(0,0,0,0.15)] transition-colors">
+      {/* Right Side Panel (desktop only) */}
+      <div className="hidden xl:flex w-72 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-gray-800 flex-col shrink-0 overflow-y-auto transition-colors">
         <div className="p-6 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4">Quick Actions</h3>
           <div className="space-y-2">

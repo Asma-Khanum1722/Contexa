@@ -324,14 +324,14 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-8 py-14 space-y-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:py-14 space-y-6 sm:space-y-10">
         
         {/* Header */}
         <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white transition-colors">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white transition-colors">
             Create a new Chatbot
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium transition-colors">
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium transition-colors">
             Upload documents or knowledge bases to generate an intelligent assistant.
           </p>
         </div>
@@ -343,7 +343,7 @@ export default function Dashboard() {
             onDragLeave={onDragLeave}
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`p-10 m-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 border-2 border-dashed rounded-xl ${
+            className={`p-6 sm:p-10 m-3 sm:m-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 border-2 border-dashed rounded-xl ${
               isDragging 
                 ? 'bg-brand-primary/5 border-brand-primary text-brand-primary dark:bg-brand-primary/10' 
                 : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -358,17 +358,17 @@ export default function Dashboard() {
           </div>
 
           {files.length > 0 && (
-            <div className="px-6 pb-4">
+            <div className="px-4 sm:px-6 pb-4">
               <div className="border border-gray-100 dark:border-gray-800 rounded-xl divide-y divide-gray-100 dark:divide-gray-800 overflow-hidden">
                 {files.map((file, i) => (
                   <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 shrink-0 rounded-lg bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
                         <IconFile />
                       </div>
-                      <span className="font-medium text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+                      <span className="font-medium text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate">{file.name}</span>
                     </div>
-                    <button onClick={(e) => { e.stopPropagation(); removeFile(i); }} className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                    <button onClick={(e) => { e.stopPropagation(); removeFile(i); }} className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors shrink-0">
                       <IconTrash />
                     </button>
                   </div>
@@ -377,7 +377,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#0F172A] mt-2 transition-colors">
+          <div className="px-4 sm:px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-3 sm:gap-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#0F172A] mt-2 transition-colors">
             <div className="flex-1 mt-4">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Bot Name (Optional)</label>
               <input 

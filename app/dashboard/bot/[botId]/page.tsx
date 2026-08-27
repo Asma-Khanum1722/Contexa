@@ -173,30 +173,71 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
   };
 
   const [activeTab, setActiveTab] = useState<"general" | "appearance" | "embed" | "danger">("general");
+  const [mobileView, setMobileView] = useState<"settings" | "preview">("settings");
 
   return (
-    <div className="flex h-full w-full font-sans overflow-hidden transition-colors duration-200">
-      {/* Left Pane - Settings Container */}
-      <div className="w-[520px] bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800 flex relative z-10 shadow-sm transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full w-full font-sans overflow-hidden transition-colors duration-200">
+      
+      {/* Mobile Top Navigation Header */}
+      <div className="lg:hidden h-14 bg-white dark:bg-[#0F172A] border-b border-gray-200 dark:border-gray-800 px-4 flex items-center justify-between shrink-0 z-20">
+        <Link 
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-brand-primary transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Bots
+        </Link>
         
-        {/* Sub-nav */}
-        <div className="w-44 border-r border-gray-100 dark:border-gray-800/80 flex flex-col pt-6 bg-gray-50/70 dark:bg-[#0B1120]/70 shrink-0">
-          <div className="px-4 mb-6">
+        {/* Mobile View Switcher */}
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg">
+          <button
+            type="button"
+            onClick={() => setMobileView("settings")}
+            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              mobileView === "settings"
+                ? "bg-white dark:bg-[#0F172A] text-gray-900 dark:text-white shadow-xs font-semibold"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            Settings
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView("preview")}
+            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              mobileView === "preview"
+                ? "bg-white dark:bg-[#0F172A] text-gray-900 dark:text-white shadow-xs font-semibold"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            Preview
+          </button>
+        </div>
+      </div>
+
+      {/* Left Pane - Settings Container */}
+      <div className={`w-full lg:w-[460px] xl:w-[520px] bg-white dark:bg-[#0F172A] lg:border-r border-gray-200 dark:border-gray-800 flex flex-col lg:flex-row relative z-10 shadow-sm transition-colors duration-200 overflow-hidden shrink-0 ${
+        mobileView === "settings" ? "flex flex-1 lg:flex-initial" : "hidden lg:flex"
+      }`}>
+        
+        {/* Sub-nav (Horizontal on mobile, vertical on desktop) */}
+        <div className="w-full lg:w-44 border-b lg:border-b-0 lg:border-r border-gray-100 dark:border-gray-800/80 flex flex-row lg:flex-col pt-2 lg:pt-6 bg-gray-50/70 dark:bg-[#0B1120]/70 shrink-0 overflow-x-auto lg:overflow-visible">
+          <div className="hidden lg:block px-4 mb-6">
             <Link 
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group cursor-pointer"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-brand-primary transition-colors group cursor-pointer"
             >
-              <span className="p-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-indigo-300 dark:group-hover:border-indigo-600 transition-colors shadow-xs">
+              <span className="p-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-brand-primary transition-colors shadow-xs">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
               </span>
               Back to Bots
             </Link>
           </div>
-          <nav className="flex flex-col gap-1 px-3">
+          <nav className="flex flex-row lg:flex-col gap-1 px-2 lg:px-3 pb-2 lg:pb-0 w-full">
             <button
               type="button"
               onClick={() => setActiveTab("general")}
-              className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+              className={`whitespace-nowrap text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer shrink-0 ${
                 activeTab === "general"
                   ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
                   : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-850 hover:text-gray-900 dark:hover:text-gray-200"
@@ -207,7 +248,7 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
             <button
               type="button"
               onClick={() => setActiveTab("appearance")}
-              className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+              className={`whitespace-nowrap text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer shrink-0 ${
                 activeTab === "appearance"
                   ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
                   : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-850 hover:text-gray-900 dark:hover:text-gray-200"
@@ -218,7 +259,7 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
             <button
               type="button"
               onClick={() => setActiveTab("embed")}
-              className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+              className={`whitespace-nowrap text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer shrink-0 ${
                 activeTab === "embed"
                   ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
                   : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-850 hover:text-gray-900 dark:hover:text-gray-200"
@@ -229,7 +270,7 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
             <button
               type="button"
               onClick={() => setActiveTab("danger")}
-              className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors mt-3 cursor-pointer ${
+              className={`whitespace-nowrap text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors lg:mt-3 cursor-pointer shrink-0 ${
                 activeTab === "danger"
                   ? "bg-red-50 dark:bg-red-950/40 text-red-600 font-semibold"
                   : "text-red-500 hover:bg-red-50/50 dark:hover:bg-red-950/20"
@@ -241,8 +282,8 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
         </div>
 
         {/* Settings Content */}
-        <div className="flex-1 flex flex-col relative h-full">
-          <div className="px-8 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between flex-shrink-0 transition-colors">
+        <div className="flex-1 flex flex-col relative h-full min-w-0">
+          <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between flex-shrink-0 transition-colors">
             <div>
               <h1 className="text-base font-semibold text-gray-900 dark:text-white">
                 {activeTab === "general" && "General Settings"}
@@ -439,7 +480,9 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
       </div>
 
       {/* Right Pane: Live Preview */}
-      <div className="flex-1 relative flex items-center justify-center">
+      <div className={`flex-1 relative items-center justify-center ${
+        mobileView === "preview" ? "flex w-full h-full" : "hidden lg:flex"
+      }`}>
         <iframe
           ref={iframeRef}
           srcDoc={iframeSrcDoc}

@@ -145,12 +145,19 @@
     
     @media (max-width: 480px) {
       #sb-panel {
-        right: 16px; bottom: 84px;
-        max-width: calc(100% - 32px);
-        max-height: calc(100% - 100px);
+        right: 12px;
+        left: 12px;
+        bottom: 80px;
+        width: auto;
+        max-width: none;
+        height: auto;
+        max-height: calc(100vh - 96px);
+        max-height: calc(100% - 96px);
+        border-radius: 16px;
       }
       #sb-bubble {
-        right: 16px; bottom: 16px;
+        right: 16px;
+        bottom: 16px;
       }
     }
     #sb-panel.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
