@@ -349,6 +349,7 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
         </div>
 
       </div>
+      </div>
 
       {/* Right Pane: Live Preview */}
       <div className="flex-1 relative flex items-center justify-center">
