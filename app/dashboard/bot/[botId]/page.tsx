@@ -172,6 +172,8 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
     }
   };
 
+  const [activeTab, setActiveTab] = useState<"general" | "appearance" | "embed" | "danger">("general");
+
   return (
     <div className="flex h-full w-full font-sans overflow-hidden transition-colors duration-200">
       {/* Left Pane - Settings Container */}
@@ -180,18 +182,61 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
         {/* Sub-nav */}
         <div className="w-44 border-r border-gray-100 dark:border-gray-800/80 flex flex-col pt-6 bg-gray-50/70 dark:bg-[#0B1120]/70 shrink-0">
           <div className="px-4 mb-6">
-            <Link href="/dashboard" className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group">
-              <span className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-indigo-300 dark:group-hover:border-indigo-600 transition-colors shadow-xs">
+            <Link 
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group cursor-pointer"
+            >
+              <span className="p-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-indigo-300 dark:group-hover:border-indigo-600 transition-colors shadow-xs">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
               </span>
               Back to Bots
             </Link>
           </div>
-          <nav className="flex flex-col gap-1 px-3 sticky top-6">
-            <a href="#general" className="px-3 py-2 text-xs font-semibold rounded-xl text-gray-700 dark:text-gray-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all">General</a>
-            <a href="#appearance" className="px-3 py-2 text-xs font-semibold rounded-xl text-gray-700 dark:text-gray-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all">Appearance</a>
-            <a href="#embed" className="px-3 py-2 text-xs font-semibold rounded-xl text-gray-700 dark:text-gray-300 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all">Embed Code</a>
-            <a href="#danger" className="px-3 py-2 text-xs font-semibold rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all mt-4">Danger Zone</a>
+          <nav className="flex flex-col gap-1 px-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab("general")}
+              className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                activeTab === "general"
+                  ? "bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-transparent text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 font-bold shadow-xs"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200"
+              }`}
+            >
+              General
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("appearance")}
+              className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                activeTab === "appearance"
+                  ? "bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-transparent text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 font-bold shadow-xs"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200"
+              }`}
+            >
+              Appearance
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("embed")}
+              className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                activeTab === "embed"
+                  ? "bg-gradient-to-r from-indigo-500/15 via-purple-500/10 to-transparent text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 font-bold shadow-xs"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/60 hover:text-gray-900 dark:hover:text-gray-200"
+              }`}
+            >
+              Embed Code
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("danger")}
+              className={`w-full text-left px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all mt-4 cursor-pointer ${
+                activeTab === "danger"
+                  ? "bg-red-50 dark:bg-red-950/40 text-red-600 border-l-2 border-red-600 font-bold shadow-xs"
+                  : "text-red-500/80 hover:bg-red-50/60 dark:hover:bg-red-950/20 hover:text-red-600"
+              }`}
+            >
+              Danger Zone
+            </button>
           </nav>
         </div>
 
@@ -199,11 +244,16 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
         <div className="flex-1 flex flex-col relative h-full">
           <div className="px-8 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between flex-shrink-0 transition-colors bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-sm">
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Bot Configuration</h1>
+              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                {activeTab === "general" && "General Settings"}
+                {activeTab === "appearance" && "Appearance & Branding"}
+                {activeTab === "embed" && "Installation & Embed"}
+                {activeTab === "danger" && "Danger Zone"}
+              </h1>
               <p className="text-xs text-gray-400 font-mono">ID: {botId}</p>
             </div>
             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/50 dark:border-indigo-800/40 px-2.5 py-1 rounded-full">
-              Live Sync
+              Live Preview
             </span>
           </div>
 
@@ -212,113 +262,105 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
               <svg className="animate-spin h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto px-8 py-8 space-y-10 scroll-smooth">
+            <div className="flex-1 overflow-y-auto px-8 py-8 space-y-8">
               
-              {/* General Section */}
-              <div id="general" className="space-y-4 pt-2">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                  General Settings
-                </h2>
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Display Name</label>
-                  <input
-                    type="text"
-                    value={config.name}
-                    onChange={e => setConfig(c => ({ ...c, name: e.target.value }))}
-                    placeholder="e.g. Support Bot"
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 bg-white dark:bg-[#1E293B] transition-all shadow-sm"
-                  />
-                </div>
-              </div>
-
-              {/* Appearance Section */}
-              <div id="appearance" className="space-y-6 pt-4">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                  Appearance & Branding
-                </h2>
-                
-                {/* Brand Color */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Brand Accent Color</label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
-                      <input type="color" value={config.themeColor} onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))} className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-none" />
-                    </div>
+              {/* General Tab */}
+              {activeTab === "general" && (
+                <div className="space-y-5 animate-fade-slide-up">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Display Name</label>
                     <input
-                      type="text" value={config.themeColor}
-                      onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))}
-                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all shadow-sm uppercase"
+                      type="text"
+                      value={config.name}
+                      onChange={e => setConfig(c => ({ ...c, name: e.target.value }))}
+                      placeholder="e.g. Acme Support Bot"
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 bg-white dark:bg-[#1E293B] transition-all shadow-sm"
                     />
+                    <p className="text-xs text-gray-400 mt-2">The name displayed in the chatbot header and browser title.</p>
                   </div>
                 </div>
+              )}
 
-                {/* Background Color */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Chat Window Background</label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
-                      <input type="color" value={config.bgColor} onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))} className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-none" />
-                    </div>
-                    <input
-                      type="text" value={config.bgColor}
-                      onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))}
-                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all shadow-sm uppercase"
-                    />
-                  </div>
-                </div>
-
-                {/* Avatar Image */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Avatar Icon</label>
-                  <div className="flex items-center gap-4">
-                    <label className={`relative group cursor-pointer w-16 h-16 rounded-2xl border-2 border-dashed flex items-center justify-center shrink-0 transition-all ${config.avatarUrl ? 'border-transparent' : 'border-gray-300 dark:border-gray-600 hover:border-indigo-500 hover:bg-indigo-50/10'} ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-                      <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                      {config.avatarUrl ? (
-                        <>
-                          <img src={config.avatarUrl} alt="Avatar" className="w-full h-full rounded-2xl object-cover shadow-sm" />
-                          <div className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 5v14M5 12h14"/></svg>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                          <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center bg-white/80 dark:bg-[#0F172A]/80 transition-opacity">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600 dark:text-indigo-400"><path d="M12 5v14M5 12h14"/></svg>
-                          </div>
-                        </>
-                      )}
-                    </label>
-                    <div className="flex flex-col items-start gap-1">
-                      {config.avatarUrl ? (
-                        <button onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-semibold text-red-500 hover:text-red-600 transition-colors px-1 pt-1">
-                          Remove icon
-                        </button>
-                      ) : (
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Click to upload custom logo</span>
-                      )}
-                      {uploading && <span className="text-xs font-bold text-indigo-600 animate-pulse">Uploading…</span>}
+              {/* Appearance Tab */}
+              {activeTab === "appearance" && (
+                <div className="space-y-6 animate-fade-slide-up">
+                  {/* Brand Color */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Brand Accent Color</label>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
+                        <input type="color" value={config.themeColor} onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))} className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-none" />
+                      </div>
+                      <input
+                        type="text" value={config.themeColor}
+                        onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))}
+                        className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all shadow-sm uppercase"
+                      />
                     </div>
                   </div>
+
+                  {/* Background Color */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Chat Window Background</label>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-11 h-11 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
+                        <input type="color" value={config.bgColor} onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))} className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-none" />
+                      </div>
+                      <input
+                        type="text" value={config.bgColor}
+                        onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))}
+                        className="flex-1 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm font-mono font-bold text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all shadow-sm uppercase"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Avatar Image */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Avatar Icon</label>
+                    <div className="flex items-center gap-4">
+                      <label className={`relative group cursor-pointer w-16 h-16 rounded-2xl border-2 border-dashed flex items-center justify-center shrink-0 transition-all ${config.avatarUrl ? 'border-transparent' : 'border-gray-300 dark:border-gray-600 hover:border-indigo-500 hover:bg-indigo-50/10'} ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                        {config.avatarUrl ? (
+                          <>
+                            <img src={config.avatarUrl} alt="Avatar" className="w-full h-full rounded-2xl object-cover shadow-sm" />
+                            <div className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center bg-white/80 dark:bg-[#0F172A]/80 transition-opacity">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600 dark:text-indigo-400"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
+                          </>
+                        )}
+                      </label>
+                      <div className="flex flex-col items-start gap-1">
+                        {config.avatarUrl ? (
+                          <button type="button" onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-semibold text-red-500 hover:text-red-600 transition-colors px-1 pt-1 cursor-pointer">
+                            Remove icon
+                          </button>
+                        ) : (
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Click to upload custom logo</span>
+                        )}
+                        {uploading && <span className="text-xs font-bold text-indigo-600 animate-pulse">Uploading…</span>}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
               
-              {/* Embed Section */}
-              <div id="embed" className="space-y-4 pt-4">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Website Embed Snippet
-                </h2>
-                
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Copy and paste this snippet anywhere before the closing <code>&lt;/body&gt;</code> tag.</p>
+              {/* Embed Tab */}
+              {activeTab === "embed" && (
+                <div className="space-y-4 animate-fade-slide-up">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Copy and paste this snippet anywhere before the closing <code>&lt;/body&gt;</code> tag of your website.</p>
                   <div className="relative group">
                     <pre className="bg-gray-900 dark:bg-black/70 border border-gray-800 rounded-xl px-4 py-3.5 text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap break-all select-all transition-colors shadow-inner">
     {`<script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-bot="${botId}"></script>`}
                     </pre>
                     <button
+                      type="button"
                       onClick={() => {
                         const snippet = `<script src="${window.location.origin}/widget.js" data-bot="${botId}"></script>`;
                         navigator.clipboard.writeText(snippet);
@@ -332,28 +374,41 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
                     </button>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Danger Zone Section */}
-              <div id="danger" className="space-y-4 pt-4 pb-8">
-                <h2 className="text-sm font-bold text-red-500 border-b border-red-100 dark:border-red-900/30 pb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                  Danger Zone
-                </h2>
-                <div className="p-4 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/20">
-                  <p className="text-xs text-red-600/90 dark:text-red-400 mb-3 font-medium">Permanently deletes this bot and un-indexes all vectorized knowledge.</p>
-                  <button className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-colors shadow-sm cursor-pointer">
-                    Delete Bot Permanently
-                  </button>
+              {/* Danger Tab */}
+              {activeTab === "danger" && (
+                <div className="space-y-4 animate-fade-slide-up">
+                  <div className="p-5 rounded-2xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20">
+                    <h3 className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">Delete this Chatbot</h3>
+                    <p className="text-xs text-red-600/80 dark:text-red-400/80 mb-4 font-medium">Permanently deletes this bot configuration and purges all vectorized knowledge embeddings from Pinecone. This action cannot be undone.</p>
+                    <button 
+                      type="button"
+                      onClick={async () => {
+                        if (confirm("Are you sure you want to permanently delete this bot?")) {
+                          const token = await auth.currentUser?.getIdToken();
+                          await fetch("/api/bots", {
+                            method: "DELETE",
+                            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                            body: JSON.stringify({ botId }),
+                          });
+                          window.location.href = "/dashboard";
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
+                    >
+                      Delete Bot Permanently
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Spacer for bottom bar */}
               <div className="h-24"></div>
             </div>
           )}
 
-        {/* Floating Unsaved Changes Bar inside Left Pane */}
+        {/* Floating Unsaved Changes Bar */}
         {hasChanges && (
           <div 
             className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] animate-fade-slide-up z-20"
@@ -365,12 +420,14 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
               </span>
               <div className="flex gap-2 shrink-0">
                 <button
+                  type="button"
                   onClick={discardChanges}
                   className="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
                 >
                   Discard
                 </button>
                 <button
+                  type="button"
                   onClick={saveConfig}
                   disabled={saving}
                   className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg transition-all shadow-sm shadow-indigo-500/20 disabled:opacity-50 cursor-pointer"
