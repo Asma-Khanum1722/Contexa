@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { auth } from "@/lib/firebase";
 
@@ -55,6 +55,34 @@ function maskIp(ip: string) {
   return ip.slice(0, 6) + "...";
 }
 
+function Sparkline({ data, colorClass }: { data: number[], colorClass: string }) {
+  if (!data || data.length === 0) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * 100;
+    const y = 30 - ((d - min) / range) * 26;
+    return `${x},${y}`;
+  }).join(" ");
+
+  return (
+    <svg className="w-16 h-8 overflow-visible" viewBox="0 0 100 30" preserveAspectRatio="none">
+      <polyline 
+        points={points} 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={colorClass}
+        style={{ vectorEffect: 'non-scaling-stroke' }}
+      />
+    </svg>
+  );
+}
+
 export default function UsersCRMPage() {
   const { user } = useAuth();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -80,6 +108,21 @@ export default function UsersCRMPage() {
       setLoading(false);
     }
   }, []);
+
+  const sparklineData = useMemo(() => {
+    if (sessions.length === 0) return [0, 0, 0, 0, 0, 0, 0];
+    const now = Date.now();
+    const bins = new Array(7).fill(0);
+    const binSize = (24 * 60 * 60 * 1000) / 7;
+    sessions.forEach(s => {
+      const age = now - s.startedAt;
+      if (age < 24 * 60 * 60 * 1000) {
+        const binIndex = 6 - Math.floor(age / binSize);
+        if (binIndex >= 0 && binIndex < 7) bins[binIndex]++;
+      }
+    });
+    return bins;
+  }, [sessions]);
 
   useEffect(() => {
     if (user) {
@@ -129,7 +172,10 @@ export default function UsersCRMPage() {
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-16"></div>
               ) : (
-                <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
+                <div className="flex items-end justify-between">
+                  <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.totalSessions.toLocaleString()}</div>
+                  <Sparkline data={sparklineData} colorClass="text-gray-900 dark:text-white" />
+                </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Unique chat sessions</div>
             </div>
@@ -140,7 +186,10 @@ export default function UsersCRMPage() {
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-12"></div>
               ) : (
-                <div className="text-3xl font-semibold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
+                <div className="flex items-end justify-between">
+                  <div className="text-3xl font-semibold text-brand-primary dark:text-brand-accent">{stats.activeSessions}</div>
+                  {stats.activeSessions > 0 && <span className="flex h-3 w-3"><span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-brand-primary opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-brand-primary"></span></span>}
+                </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Active in last 5 mins</div>
             </div>
@@ -151,7 +200,9 @@ export default function UsersCRMPage() {
               {loading ? (
                 <div className="h-9 bg-gray-100 dark:bg-gray-800 rounded animate-shimmer w-14"></div>
               ) : (
-                <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.avgMessages}</div>
+                <div className="flex items-end justify-between">
+                  <div className="text-3xl font-semibold text-gray-900 dark:text-white">{stats.avgMessages}</div>
+                </div>
               )}
               <div className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">Messages per session</div>
             </div>
