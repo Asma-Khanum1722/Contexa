@@ -163,126 +163,166 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
 
   return (
     <div className="flex h-full font-sans overflow-hidden transition-colors duration-200">
-      {/* Left Pane */}
-      <div className="w-[360px] bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800 flex flex-col relative z-10 shadow-sm transition-colors duration-200">
-        {/* Nav Header */}
-        <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
-          <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 transition-colors mb-4">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            Back to Bots
-          </Link>
-          <h1 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">Appearance</h1>
+      {/* Left Pane - Settings Container */}
+      <div className="w-[520px] bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800 flex relative z-10 shadow-sm transition-colors duration-200">
+        
+        {/* Sub-nav */}
+        <div className="w-40 border-r border-gray-100 dark:border-gray-800 flex flex-col pt-6 bg-gray-50/50 dark:bg-[#0B1120]/50 shrink-0">
+          <div className="px-4 mb-8">
+            <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back to Bots
+            </Link>
+          </div>
+          <nav className="flex flex-col gap-1 px-3 sticky top-6">
+            <a href="#general" className="px-3 py-2 text-xs font-semibold rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">General</a>
+            <a href="#appearance" className="px-3 py-2 text-xs font-semibold rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">Appearance</a>
+            <a href="#embed" className="px-3 py-2 text-xs font-semibold rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">Embed</a>
+            <a href="#danger" className="px-3 py-2 text-xs font-semibold rounded-lg text-red-500/80 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors mt-4">Danger Zone</a>
+          </nav>
         </div>
 
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <svg className="animate-spin h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        {/* Settings Content */}
+        <div className="flex-1 flex flex-col relative h-full">
+          <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">Configuration</h1>
           </div>
-        ) : (
-          <div className="flex-1 overflow-y-auto px-8 py-8 space-y-10">
-            
-            {/* Display Name */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Display Name</label>
-              <input
-                type="text"
-                value={config.name}
-                onChange={e => setConfig(c => ({ ...c, name: e.target.value }))}
-                placeholder="e.g. Support Bot"
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-white dark:bg-[#1E293B] transition-all shadow-sm"
-              />
-            </div>
 
-            {/* Brand Color */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Brand Color</label>
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
-                  <input type="color" value={config.themeColor} onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))} className="absolute -top-2 -left-2 w-14 h-14 cursor-pointer border-none" />
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <svg className="animate-spin h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto px-8 py-8 space-y-12 scroll-smooth">
+              
+              {/* General Section */}
+              <div id="general" className="space-y-6 pt-2">
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">General Settings</h2>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Display Name</label>
+                  <input
+                    type="text"
+                    value={config.name}
+                    onChange={e => setConfig(c => ({ ...c, name: e.target.value }))}
+                    placeholder="e.g. Support Bot"
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-white dark:bg-[#1E293B] transition-all shadow-sm"
+                  />
                 </div>
-                <input
-                  type="text" value={config.themeColor}
-                  onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))}
-                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-mono font-medium text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all shadow-sm uppercase"
-                />
               </div>
-            </div>
 
-            {/* Background Color */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Chat Background</label>
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
-                  <input type="color" value={config.bgColor} onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))} className="absolute -top-2 -left-2 w-14 h-14 cursor-pointer border-none" />
+              {/* Appearance Section */}
+              <div id="appearance" className="space-y-6 pt-6">
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">Appearance</h2>
+                
+                {/* Brand Color */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Brand Color</label>
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
+                      <input type="color" value={config.themeColor} onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))} className="absolute -top-2 -left-2 w-14 h-14 cursor-pointer border-none" />
+                    </div>
+                    <input
+                      type="text" value={config.themeColor}
+                      onChange={e => setConfig(c => ({ ...c, themeColor: e.target.value }))}
+                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-mono font-medium text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all shadow-sm uppercase"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text" value={config.bgColor}
-                  onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))}
-                  className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-mono font-medium text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all shadow-sm uppercase"
-                />
-              </div>
-            </div>
 
-            {/* Avatar Image */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Avatar Image</label>
-              <div className="flex items-center gap-4">
-                <label className={`relative group cursor-pointer w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center shrink-0 transition-all ${config.avatarUrl ? 'border-transparent' : 'border-gray-300 dark:border-gray-600 hover:border-brand-primary dark:hover:border-brand-accent hover:bg-brand-primary/5 dark:hover:bg-brand-accent/5'} ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-                  <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                  {config.avatarUrl ? (
-                    <>
-                      <img src={config.avatarUrl} alt="Avatar" className="w-full h-full rounded-full object-cover shadow-sm" />
-                      <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 5v14M5 12h14"/></svg>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500 group-hover:text-brand-primary dark:group-hover:text-brand-accent transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                      <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center bg-white/80 dark:bg-[#0F172A]/80 transition-opacity">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary dark:text-brand-accent"><path d="M12 5v14M5 12h14"/></svg>
-                      </div>
-                    </>
-                  )}
-                </label>
-                <div className="flex flex-col items-start gap-1">
-                  {config.avatarUrl ? (
-                    <button onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-1 pt-1">
-                      Remove photo
+                {/* Background Color */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Chat Background</label>
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden shrink-0 transition-colors">
+                      <input type="color" value={config.bgColor} onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))} className="absolute -top-2 -left-2 w-14 h-14 cursor-pointer border-none" />
+                    </div>
+                    <input
+                      type="text" value={config.bgColor}
+                      onChange={e => setConfig(c => ({ ...c, bgColor: e.target.value }))}
+                      className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-sm font-mono font-medium text-gray-900 dark:text-white bg-white dark:bg-[#1E293B] focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all shadow-sm uppercase"
+                    />
+                  </div>
+                </div>
+
+                {/* Avatar Image */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Avatar Image</label>
+                  <div className="flex items-center gap-4">
+                    <label className={`relative group cursor-pointer w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center shrink-0 transition-all ${config.avatarUrl ? 'border-transparent' : 'border-gray-300 dark:border-gray-600 hover:border-brand-primary dark:hover:border-brand-accent hover:bg-brand-primary/5 dark:hover:bg-brand-accent/5'} ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                      {config.avatarUrl ? (
+                        <>
+                          <img src={config.avatarUrl} alt="Avatar" className="w-full h-full rounded-full object-cover shadow-sm" />
+                          <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 5v14M5 12h14"/></svg>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400 dark:text-gray-500 group-hover:text-brand-primary dark:group-hover:text-brand-accent transition-colors"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center bg-white/80 dark:bg-[#0F172A]/80 transition-opacity">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-primary dark:text-brand-accent"><path d="M12 5v14M5 12h14"/></svg>
+                          </div>
+                        </>
+                      )}
+                    </label>
+                    <div className="flex flex-col items-start gap-1">
+                      {config.avatarUrl ? (
+                        <button onClick={() => setConfig(c => ({ ...c, avatarUrl: "" }))} className="text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-1 pt-1">
+                          Remove photo
+                        </button>
+                      ) : (
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Click to upload avatar</span>
+                      )}
+                      {uploading && <span className="text-xs font-medium text-brand-primary">Uploading…</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Embed Section */}
+              <div id="embed" className="space-y-6 pt-6">
+                <h2 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">Installation</h2>
+                
+                {/* Embed Code */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Embed Code</label>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Paste this snippet into any website&apos;s HTML to add the chatbot.</p>
+                  <div className="relative group">
+                    <pre className="bg-gray-50 dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-xs font-mono text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap break-all select-all transition-colors">
+    {`<script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-bot="${botId}"></script>`}
+                    </pre>
+                    <button
+                      onClick={() => {
+                        const snippet = `<script src="${window.location.origin}/widget.js" data-bot="${botId}"></script>`;
+                        navigator.clipboard.writeText(snippet);
+                        const btn = document.getElementById("copy-btn");
+                        if (btn) { btn.textContent = "Copied!"; setTimeout(() => { btn.textContent = "Copy"; }, 2000); }
+                      }}
+                      id="copy-btn"
+                      className="absolute top-2 right-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm"
+                    >
+                      Copy
                     </button>
-                  ) : (
-                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Click to upload avatar</span>
-                  )}
-                  {uploading && <span className="text-xs font-medium text-brand-primary">Uploading…</span>}
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* Embed Code */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Embed Code</label>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Paste this snippet into any website&apos;s HTML to add the chatbot.</p>
-              <div className="relative group">
-                <pre className="bg-gray-50 dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-xs font-mono text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap break-all select-all transition-colors">
-{`<script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-bot="${botId}"></script>`}
-                </pre>
-                <button
-                  onClick={() => {
-                    const snippet = `<script src="${window.location.origin}/widget.js" data-bot="${botId}"></script>`;
-                    navigator.clipboard.writeText(snippet);
-                    const btn = document.getElementById("copy-btn");
-                    if (btn) { btn.textContent = "Copied!"; setTimeout(() => { btn.textContent = "Copy"; }, 2000); }
-                  }}
-                  id="copy-btn"
-                  className="absolute top-2 right-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
 
-            {/* Spacer for bottom bar */}
-            <div className="h-16"></div>          </div>
-        )}
+              {/* Danger Zone Section */}
+              <div id="danger" className="space-y-6 pt-6 pb-8">
+                <h2 className="text-sm font-semibold text-red-500 border-b border-red-100 dark:border-red-900/30 pb-2">Danger Zone</h2>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Deleting this bot will permanently remove its configuration and all associated vectorized knowledge.</p>
+                  <button className="px-4 py-2 bg-white dark:bg-[#1E293B] border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-xs font-semibold rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                    Delete Bot
+                  </button>
+                </div>
+              </div>
+
+              {/* Spacer for bottom bar */}
+              <div className="h-24"></div>
+            </div>
+          )}
 
         {/* Floating Unsaved Changes Bar inside Left Pane */}
         <div 
