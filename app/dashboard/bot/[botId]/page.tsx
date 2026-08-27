@@ -247,11 +247,31 @@ export default function BotSandboxPage({ params }: { params: Promise<{ botId: st
                 </div>
               </div>
             </div>
-            
-            {/* Spacer for bottom bar */}
-            <div className="h-16"></div>
+            {/* Embed Code */}
+            <div>
+              <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Embed Code</label>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Paste this snippet into any website&apos;s HTML to add the chatbot.</p>
+              <div className="relative group">
+                <pre className="bg-gray-50 dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-xs font-mono text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap break-all select-all transition-colors">
+{`<script src="${typeof window !== "undefined" ? window.location.origin : ""}/widget.js" data-bot="${botId}"></script>`}
+                </pre>
+                <button
+                  onClick={() => {
+                    const snippet = `<script src="${window.location.origin}/widget.js" data-bot="${botId}"></script>`;
+                    navigator.clipboard.writeText(snippet);
+                    const btn = document.getElementById("copy-btn");
+                    if (btn) { btn.textContent = "Copied!"; setTimeout(() => { btn.textContent = "Copy"; }, 2000); }
+                  }}
+                  id="copy-btn"
+                  className="absolute top-2 right-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
 
-          </div>
+            {/* Spacer for bottom bar */}
+            <div className="h-16"></div>          </div>
         )}
 
         {/* Floating Unsaved Changes Bar inside Left Pane */}

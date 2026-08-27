@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Contexa — Turn documents into chatbots",
+  title: "Contexa | Turn documents into chatbots",
   description:
     "Upload PDFs, scanned images, or any document and instantly generate an embeddable AI chatbot for your website. No API keys required.",
   keywords: ["chatbot", "document", "AI", "embed", "PDF", "OCR", "RAG", "Contexa"],
