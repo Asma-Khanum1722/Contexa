@@ -2,17 +2,12 @@
  * lib/rateLimit.ts
  * Token-bucket rate limiter backed by Upstash Redis when env vars are
  * present, falling back to an in-process sliding-window for local dev.
- *
- * Usage:
- *   const { limited, remaining } = await checkRateLimit(identifier);
- *   if (limited) throw new RateLimitError();
  */
 
 import { RateLimitError } from "./errors";
 
 // ─── Upstash adapter (production) ────────────────────────────────────────────
 
-// Lazy singleton — reuse the same Ratelimit+Redis instance across requests.
 let _ratelimitInstance: any | null = null;
 
 async function getUpstashRatelimit() {
@@ -37,8 +32,6 @@ async function upstashCheck(
 ): Promise<{ limited: boolean; remaining: number }> {
   const { Ratelimit, redis } = await getUpstashRatelimit();
 
-  // Create per-config limiters — in practice most calls use the same params
-  // so this is effectively a singleton per (limit, window) pair.
   const ratelimit = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(limit, `${windowSeconds} s`),
@@ -53,7 +46,7 @@ async function upstashCheck(
 // ─── In-process adapter (dev / fallback) ─────────────────────────────────────
 
 const inProcessHits = new Map<string, number[]>();
-const CLEANUP_INTERVAL_MS = 60_000; // Run cleanup every 60s
+const CLEANUP_INTERVAL_MS = 60_000;
 let _cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
 function ensureCleanupTimer() {
@@ -61,7 +54,6 @@ function ensureCleanupTimer() {
   _cleanupTimer = setInterval(() => {
     const now = Date.now();
     for (const [key, timestamps] of inProcessHits.entries()) {
-      // Remove entries older than 2 minutes (generous window)
       const fresh = timestamps.filter((t) => now - t < 120_000);
       if (fresh.length === 0) {
         inProcessHits.delete(key);
@@ -70,7 +62,6 @@ function ensureCleanupTimer() {
       }
     }
   }, CLEANUP_INTERVAL_MS);
-  // Don't prevent process exit
   if (_cleanupTimer && typeof _cleanupTimer === "object" && "unref" in _cleanupTimer) {
     _cleanupTimer.unref();
   }
@@ -95,11 +86,6 @@ function inProcessCheck(
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-/**
- * @param identifier   Unique key (e.g. `${botId}:${ip}` or just `botId`)
- * @param limit        Max requests allowed in the window. Default: 30
- * @param windowSeconds Window length in seconds. Default: 60
- */
 export async function checkRateLimit(
   identifier: string,
   limit = 30,
@@ -110,15 +96,17 @@ export async function checkRateLimit(
     process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (hasUpstash) {
-    return upstashCheck(identifier, limit, windowSeconds);
+    try {
+      return await upstashCheck(identifier, limit, windowSeconds);
+    } catch (err) {
+      console.warn("[rateLimit] Upstash Redis request failed, falling back to in-memory:", err);
+      return inProcessCheck(identifier, limit, windowSeconds);
+    }
   }
 
   return inProcessCheck(identifier, limit, windowSeconds);
 }
 
-/**
- * Convenience wrapper — throws RateLimitError when limited.
- */
 export async function enforceRateLimit(
   identifier: string,
   limit = 30,
