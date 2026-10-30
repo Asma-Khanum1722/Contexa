@@ -14,6 +14,8 @@ const REQUIRED = [
 ] as const;
 
 const OPTIONAL = [
+  "GEMINI_MODEL",
+  "GEMINI_EMBEDDING_MODEL",
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "NEXT_PUBLIC_FIREBASE_API_KEY",
@@ -61,10 +63,15 @@ if (typeof window === "undefined" && !isBuildPhase) validate();
 
 export function env(key: RequiredEnvKey): string {
   const val = process.env[key] as string;
-  return val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '') : val;
+  const cleaned = val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').trim() : '';
+  if (!cleaned && typeof window === "undefined" && !isBuildPhase) {
+    throw new Error(`[Contexa] Missing required environment variable: ${key}. Please check your .env.local file.`);
+  }
+  return cleaned;
 }
 
 export function optionalEnv(key: OptionalEnvKey): string | undefined {
   const val = process.env[key];
-  return val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '') : val;
+  const cleaned = val ? val.replace(/^"|"$/g, '').replace(/^'|'$/g, '').trim() : undefined;
+  return cleaned || undefined;
 }

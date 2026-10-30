@@ -2,14 +2,6 @@
  * app/api/chat/route.ts
  * RAG chat endpoint — retrieves context from Pinecone and streams a
  * Gemini response token-by-token back to the client.
- *
- * Supports cross-origin requests (CORS) so the widget can be embedded on
- * any third-party website.
- *
- * Stream format: newline-delimited JSON, each line is one of:
- *   { type: "token",  text: "..." }
- *   { type: "done",   sources: [...], latencyMs: number }
- *   { type: "error",  error: "...", code: "..." }
  */
 
 import { NextRequest } from "next/server";
@@ -17,7 +9,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { retrieveContext } from "@/lib/embed";
 import { enforceRateLimit } from "@/lib/rateLimit";
 import { AppError, RateLimitError, ValidationError } from "@/lib/errors";
-import { env } from "@/lib/env";
+import { env, optionalEnv } from "@/lib/env";
 import { trackChatSession } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -27,7 +19,8 @@ let _chatModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = nu
 function getChatModel() {
   if (!_chatModel) {
     const genAI = new GoogleGenerativeAI(env("GEMINI_API_KEY"));
-    _chatModel = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+    const chatModelName = optionalEnv("GEMINI_MODEL") || "gemini-flash-latest";
+    _chatModel = genAI.getGenerativeModel({ model: chatModelName });
   }
   return _chatModel;
 }
@@ -82,18 +75,14 @@ export async function POST(req: NextRequest) {
           throw new ValidationError("Message too long (max 2000 characters).");
         }
 
-        // Rate limit: 30 messages per minute per botId
         const ip =
           req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
           "unknown";
         await enforceRateLimit(`chat:${botId}:${ip}`, 30, 60);
 
-        // Track this chat session in Redis for the CRM dashboard
         const userAgent = req.headers.get("user-agent") ?? "unknown";
-        // Session ID = stable hash of IP + botId + day so each user session is unique per day
         const sessionKey = `${ip}:${botId}:${new Date().toISOString().slice(0, 10)}`;
         const sessionId = Buffer.from(sessionKey).toString("base64").slice(0, 20);
-        // Fire-and-forget — don't await so it doesn't slow the chat response
         trackChatSession(botId, sessionId, ip, userAgent).catch(() => {});
 
         // Retrieve relevant context from Pinecone.
@@ -151,7 +140,6 @@ Question: ${message.trim()}`;
         });
       } catch (err) {
         const appErr = AppError.from(err);
-        // Don't leak internal error details for non-AppError exceptions.
         const isPublic = err instanceof AppError;
         emit({
           type: "error",

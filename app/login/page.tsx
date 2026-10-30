@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 export default function LoginPage() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !loading) {
@@ -18,11 +20,24 @@ export default function LoginPage() {
   }, [user, loading, router]);
 
   const handleSignIn = async () => {
+    setErrorMsg(null);
+    if (!isFirebaseConfigured) {
+      setErrorMsg("Firebase credentials are missing in .env.local. Please add NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID.");
+      return;
+    }
     setIsSigningIn(true);
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      const code = error?.code || "";
+      if (code === "auth/invalid-api-key" || code === "auth/api-key-not-valid") {
+        setErrorMsg("Firebase API Key is invalid. Please check your NEXT_PUBLIC_FIREBASE_API_KEY in .env.local.");
+      } else if (code === "auth/popup-closed-by-user") {
+        setErrorMsg("Sign-in popup was closed before completing.");
+      } else {
+        setErrorMsg(error?.message || "Failed to sign in with Google.");
+      }
       setIsSigningIn(false);
     }
   };
@@ -56,6 +71,18 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-10">
+          {!isFirebaseConfigured && (
+            <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs leading-relaxed">
+              <strong>Configuration Note:</strong> Firebase environment variables are not set in <code>.env.local</code>. Configure Firebase in your environment to enable Google Authentication.
+            </div>
+          )}
+
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs leading-relaxed">
+              {errorMsg}
+            </div>
+          )}
+
           <button
             onClick={handleSignIn}
             disabled={isSigningIn}
