@@ -15,14 +15,25 @@ import { trackChatSession } from "@/lib/db";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-let _chatModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null = null;
-function getChatModel() {
-  if (!_chatModel) {
-    const genAI = new GoogleGenerativeAI(env("GEMINI_API_KEY"));
-    const chatModelName = optionalEnv("GEMINI_MODEL") || "gemini-flash-latest";
-    _chatModel = genAI.getGenerativeModel({ model: chatModelName });
+async function streamChatResponse(prompt: string) {
+  const genAI = new GoogleGenerativeAI(env("GEMINI_API_KEY"));
+  const models = [
+    optionalEnv("GEMINI_MODEL"),
+    "gemini-3.5-flash-lite",
+    "gemini-flash-latest",
+  ].filter(Boolean) as string[];
+
+  let lastError: any = null;
+  for (const modelName of models) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      return await model.generateContentStream(prompt);
+    } catch (err) {
+      console.warn(`[chat] Streaming with ${modelName} failed, trying next:`, err);
+      lastError = err;
+    }
   }
-  return _chatModel;
+  throw lastError || new Error("Failed to generate content stream");
 }
 
 // ─── CORS preflight ──────────────────────────────────────────────────────────
@@ -119,7 +130,7 @@ ${contextBlock}
 Question: ${message.trim()}`;
 
         // Stream Gemini response token by token.
-        const result = await getChatModel().generateContentStream(prompt);
+        const result = await streamChatResponse(prompt);
 
         for await (const chunk of result.stream) {
           const text = chunk.text();
@@ -138,12 +149,13 @@ Question: ${message.trim()}`;
           })),
           latencyMs: Date.now() - start,
         });
-      } catch (err) {
+      } catch (err: any) {
+        console.error("[chat] stream error:", err);
         const appErr = AppError.from(err);
         const isPublic = err instanceof AppError;
         emit({
           type: "error",
-          error: isPublic ? appErr.message : "An internal error occurred.",
+          error: isPublic ? appErr.message : (err?.message || "An internal error occurred."),
           code: appErr.code,
         });
       } finally {
