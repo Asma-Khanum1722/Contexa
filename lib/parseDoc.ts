@@ -16,7 +16,6 @@
  */
 
 import pdf from "pdf-parse";
-import { createWorker } from "tesseract.js";
 
 // ---------------------------------------------------------------------------
 // Public entry point
@@ -41,7 +40,12 @@ export async function parseDocument(
   }
 
   if (/\.(png|jpe?g|webp|tiff?)$/i.test(lower)) {
-    const text = await ocrImage(buffer);
+    let mimeType = "image/jpeg";
+    if (lower.endsWith(".png")) mimeType = "image/png";
+    else if (lower.endsWith(".webp")) mimeType = "image/webp";
+    else if (lower.endsWith(".tiff") || lower.endsWith(".tif")) mimeType = "image/tiff";
+
+    const text = await ocrImage(buffer, mimeType);
     return { text: cleanRaw(text), method: "ocr-image" };
   }
 
@@ -73,8 +77,13 @@ async function parsePdf(buffer: Buffer): Promise<ParseResult> {
     `Running OCR on ${Math.min(totalPages, MAX_OCR_PAGES)} page(s).`
   );
 
+  const geminiText = await extractWithGemini(buffer, "application/pdf");
+  if (geminiText && geminiText.trim()) {
+    return { text: cleanRaw(geminiText), pages: totalPages, method: "ocr-pdf" };
+  }
+
   const text = await ocrScannedPdf(buffer, totalPages);
-  return { text: cleanRaw(text), pages: totalPages, method: "ocr-pdf" };
+  return { text: cleanRaw(text || rawText || "[Scanned PDF]"), pages: totalPages, method: "ocr-pdf" };
 }
 
 // ---------------------------------------------------------------------------
@@ -198,18 +207,77 @@ async function renderPageToBuffer(
 }
 
 // ---------------------------------------------------------------------------
-// Image OCR
+// Image OCR & Multimodal Extraction
 // ---------------------------------------------------------------------------
 
-async function ocrImage(buffer: Buffer): Promise<string> {
-  const worker = await createWorker("eng");
+async function extractWithGemini(buffer: Buffer, mimeType: string): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
   try {
-    const { data } = await worker.recognize(buffer);
-    return data.text;
-  } finally {
-    // Always terminate — don't leak workers in serverless environments.
-    await worker.terminate();
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const candidateModels = [
+      process.env.GEMINI_MODEL,
+      "gemini-3.5-flash-lite",
+      "gemini-flash-latest",
+    ].filter(Boolean) as string[];
+
+    for (const modelName of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const res = await model.generateContent([
+          "Extract and transcribe all text, handwritten words, questions, notes, and information from this document/image accurately verbatim. Return only the extracted text.",
+          {
+            inlineData: {
+              data: buffer.toString("base64"),
+              mimeType,
+            },
+          },
+        ]);
+        const text = res.response.text();
+        if (text && text.trim()) {
+          return text.trim();
+        }
+      } catch (err: any) {
+        console.warn(`[parseDoc] Gemini extraction with model ${modelName} failed:`, err?.message || err);
+      }
+    }
+  } catch (err) {
+    console.warn("[parseDoc] Failed to initialize Gemini for OCR:", err);
   }
+  return null;
+}
+
+async function ocrImage(buffer: Buffer, mimeType = "image/jpeg"): Promise<string> {
+  // 1. Primary: Gemini Vision OCR (fast, reliable, handles handwriting, no heavy binaries)
+  const geminiText = await extractWithGemini(buffer, mimeType);
+  if (geminiText) return geminiText;
+
+  // 2. Fallback: Tesseract.js with a strict 15s timeout
+  try {
+    const tesseractPromise = (async () => {
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker("eng");
+      try {
+        const { data } = await worker.recognize(buffer);
+        return data.text;
+      } finally {
+        await worker.terminate().catch(() => {});
+      }
+    })();
+
+    const timeoutPromise = new Promise<string>((_, reject) =>
+      setTimeout(() => reject(new Error("Tesseract OCR timeout")), 15_000)
+    );
+
+    const tessResult = await Promise.race([tesseractPromise, timeoutPromise]);
+    if (tessResult && tessResult.trim()) return tessResult;
+  } catch (err: any) {
+    console.warn("[parseDoc] Tesseract fallback failed or timed out:", err?.message || err);
+  }
+
+  return "[Image: no text could be extracted]";
 }
 
 // ---------------------------------------------------------------------------

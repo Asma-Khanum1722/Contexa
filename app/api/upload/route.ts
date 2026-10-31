@@ -27,6 +27,7 @@ const MAX_BOTS_PER_USER = 10;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   // 1. Authenticate before anything else
@@ -102,10 +103,14 @@ export async function POST(req: NextRequest) {
             method,
           });
 
+          const docText = text && text.trim().length > 0 
+            ? text 
+            : `[Document ${file.name} - No extractable text found]`;
+
           const { chunksStored } = await embedAndStore({
             botId,
             docId: nanoid(8),
-            text,
+            text: docText,
             filename: file.name,
           });
 
