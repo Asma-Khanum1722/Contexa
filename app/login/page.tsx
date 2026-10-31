@@ -31,10 +31,15 @@ export default function LoginPage() {
     } catch (error: any) {
       console.error(error);
       const code = error?.code || "";
+      const message = error?.message || "";
       if (code === "auth/invalid-api-key" || code === "auth/api-key-not-valid") {
         setErrorMsg("Firebase API Key is invalid. Please check your NEXT_PUBLIC_FIREBASE_API_KEY in .env.local.");
+      } else if (code === "auth/popup-blocked" || message.includes("popup-blocked") || message.includes("auth/popup-blocked")) {
+        setErrorMsg("Pop-up blocked: Please disable your ad blocker or allow pop-ups for this site so the web app works, then try again.");
       } else if (code === "auth/popup-closed-by-user") {
-        setErrorMsg("Sign-in popup was closed before completing.");
+        setErrorMsg("Sign-in popup was closed before completing. Please try again.");
+      } else if (code === "auth/unauthorized-domain") {
+        setErrorMsg("This domain is not authorized in Firebase Console. Please add it to your Authorized Domains under Authentication Settings.");
       } else {
         setErrorMsg(error?.message || "Failed to sign in with Google.");
       }
