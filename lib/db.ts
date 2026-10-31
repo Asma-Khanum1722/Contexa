@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 export interface BotConfig {
   name: string;
@@ -58,6 +59,19 @@ function getRedis() {
   return _redis;
 }
 
+let _pineconeIndex: any = null;
+function getPineconeIndex() {
+  if (!_pineconeIndex && process.env.PINECONE_API_KEY && process.env.PINECONE_INDEX) {
+    try {
+      const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+      _pineconeIndex = pc.index(process.env.PINECONE_INDEX);
+    } catch (e) {
+      console.warn("[db] Failed to init Pinecone for bot storage fallback:", e);
+    }
+  }
+  return _pineconeIndex;
+}
+
 // Fallback in-memory map for local development or if Redis is temporarily unreachable
 const inMemoryStore = new Map<string, BotConfig>();
 const inMemoryBots: BotRecord[] = [];
@@ -115,12 +129,37 @@ export async function registerBot(bot: BotRecord): Promise<void> {
     try {
       await redis.set(`bot_record:${bot.botId}`, bot);
       await redis.zadd(`bots_by_user:${bot.userId}`, { score: bot.createdAt, member: bot.botId });
-      return;
     } catch (e) {
       markRedisUnavailable(e);
-      console.warn("[db] Redis registerBot error, using in-memory store:", e);
+      console.warn("[db] Redis registerBot error, using fallback:", e);
     }
   }
+
+  // Persist to Pinecone __bots__ namespace so it works reliably in serverless even if Redis is unreachable
+  const pIndex = getPineconeIndex();
+  if (pIndex) {
+    try {
+      const dummyVec = new Array(768).fill(0);
+      dummyVec[0] = 1.0;
+      await pIndex.namespace("__bots__").upsert([{
+        id: bot.botId,
+        values: dummyVec,
+        metadata: {
+          botId: bot.botId,
+          userId: bot.userId,
+          name: bot.name,
+          chunks: bot.chunks,
+          filenamesJson: JSON.stringify(bot.filenames),
+          createdAt: bot.createdAt,
+          themeColor: bot.themeColor || "#0084C7",
+          avatarUrl: bot.avatarUrl || "",
+        }
+      }]);
+    } catch (err) {
+      console.warn("[db] Pinecone registerBot fallback error:", err);
+    }
+  }
+
   inMemoryBots.unshift(bot);
 }
 
@@ -129,16 +168,105 @@ export async function listBots(userId: string): Promise<BotRecord[]> {
   if (redis) {
     try {
       const botIds = await redis.zrange(`bots_by_user:${userId}`, 0, -1, { rev: true }) as string[];
-      if (!botIds || botIds.length === 0) return [];
-      
-      const keys = botIds.map(id => `bot_record:${id}`);
-      const records = await redis.mget<BotRecord[]>(...keys);
-      return records.filter((r): r is BotRecord => r !== null);
+      if (botIds && botIds.length > 0) {
+        const keys = botIds.map(id => `bot_record:${id}`);
+        const records = await redis.mget<BotRecord[]>(...keys);
+        const valid = records.filter((r): r is BotRecord => r !== null);
+        if (valid.length > 0) return valid;
+      }
     } catch (e) {
       markRedisUnavailable(e);
-      console.warn("[db] Redis listBots error, using in-memory store:", e);
+      console.warn("[db] Redis listBots error, falling back to Pinecone:", e);
     }
   }
+
+  // Fallback: Fetch bots from Pinecone
+  const pIndex = getPineconeIndex();
+  if (pIndex) {
+    try {
+      const dummyVec = new Array(768).fill(0);
+      dummyVec[0] = 1.0;
+
+      // 1. Check __bots__ namespace
+      const queryRes = await pIndex.namespace("__bots__").query({
+        vector: dummyVec,
+        topK: 50,
+        filter: { userId: { "$eq": userId } },
+        includeMetadata: true,
+      });
+
+      const pineconeBots: BotRecord[] = (queryRes.matches || []).map((m: any) => {
+        const meta = m.metadata || {};
+        let filenames: string[] = [];
+        try {
+          filenames = meta.filenamesJson ? JSON.parse(meta.filenamesJson) : (meta.filenames || []);
+        } catch {
+          filenames = [meta.filename || "document"];
+        }
+        return {
+          botId: meta.botId || m.id,
+          userId: meta.userId || userId,
+          name: meta.name || `Bot ${m.id.slice(0, 4)}`,
+          chunks: Number(meta.chunks) || 0,
+          filenames,
+          createdAt: Number(meta.createdAt) || Date.now(),
+          themeColor: meta.themeColor || "#0084C7",
+          avatarUrl: meta.avatarUrl || "",
+        };
+      });
+
+      if (pineconeBots.length > 0) {
+        return pineconeBots.sort((a, b) => b.createdAt - a.createdAt);
+      }
+
+      // 2. If __bots__ doesn't have records for this user yet, recover bots from existing namespaces
+      const stats = await pIndex.describeIndexStats();
+      const namespaces = Object.keys(stats.namespaces || {}).filter(ns => !ns.startsWith("__"));
+
+      if (namespaces.length > 0) {
+        const recoveredBots: BotRecord[] = [];
+        for (const ns of namespaces) {
+          try {
+            const sample = await pIndex.namespace(ns).query({ vector: dummyVec, topK: 1, includeMetadata: true });
+            const meta = sample.matches[0]?.metadata || {};
+            const filename = meta.filename || "uploaded-document";
+            const botRecord: BotRecord = {
+              botId: ns,
+              userId: userId,
+              name: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+              chunks: stats.namespaces[ns]?.recordCount || 1,
+              filenames: [filename],
+              createdAt: Date.now(),
+              themeColor: "#0084C7",
+              avatarUrl: "",
+            };
+            recoveredBots.push(botRecord);
+            // Save to __bots__ namespace for persistent future retrieval
+            await pIndex.namespace("__bots__").upsert([{
+              id: botRecord.botId,
+              values: dummyVec,
+              metadata: {
+                botId: botRecord.botId,
+                userId: botRecord.userId,
+                name: botRecord.name,
+                chunks: botRecord.chunks,
+                filenamesJson: JSON.stringify(botRecord.filenames),
+                createdAt: botRecord.createdAt,
+                themeColor: botRecord.themeColor,
+                avatarUrl: botRecord.avatarUrl,
+              }
+            }]).catch(() => {});
+          } catch {}
+        }
+        if (recoveredBots.length > 0) {
+          return recoveredBots;
+        }
+      }
+    } catch (err) {
+      console.warn("[db] Pinecone listBots fallback error:", err);
+    }
+  }
+
   return inMemoryBots.filter(b => b.userId === userId);
 }
 
@@ -146,13 +274,71 @@ export async function getBot(botId: string): Promise<BotRecord | null> {
   const redis = getRedis();
   if (redis) {
     try {
-      return await redis.get<BotRecord>(`bot_record:${botId}`);
+      const record = await redis.get<BotRecord>(`bot_record:${botId}`);
+      if (record) return record;
     } catch (e) {
       markRedisUnavailable(e);
-      console.warn("[db] Redis getBot error, using in-memory store:", e);
+      console.warn("[db] Redis getBot error, using fallback:", e);
     }
   }
-  return inMemoryBots.find(b => b.botId === botId) || null;
+
+  const mem = inMemoryBots.find(b => b.botId === botId);
+  if (mem) return mem;
+
+  // Fallback to Pinecone
+  const pIndex = getPineconeIndex();
+  if (pIndex) {
+    try {
+      const dummyVec = new Array(768).fill(0);
+      dummyVec[0] = 1.0;
+
+      const res = await pIndex.namespace("__bots__").query({
+        vector: dummyVec,
+        topK: 1,
+        filter: { botId: { "$eq": botId } },
+        includeMetadata: true,
+      });
+
+      if (res.matches && res.matches.length > 0) {
+        const meta = res.matches[0].metadata || {};
+        let filenames: string[] = [];
+        try {
+          filenames = meta.filenamesJson ? JSON.parse(meta.filenamesJson) : (meta.filenames || []);
+        } catch {
+          filenames = [meta.filename || "document"];
+        }
+        return {
+          botId: meta.botId || botId,
+          userId: meta.userId || "owner",
+          name: meta.name || `Bot ${botId}`,
+          chunks: Number(meta.chunks) || 0,
+          filenames,
+          createdAt: Number(meta.createdAt) || Date.now(),
+          themeColor: meta.themeColor || "#0084C7",
+          avatarUrl: meta.avatarUrl || "",
+        };
+      }
+
+      // Check if namespace exists in Pinecone
+      const stats = await pIndex.describeIndexStats();
+      if (stats.namespaces && stats.namespaces[botId]) {
+        const sample = await pIndex.namespace(botId).query({ vector: dummyVec, topK: 1, includeMetadata: true });
+        const meta = sample.matches[0]?.metadata || {};
+        return {
+          botId,
+          userId: "owner",
+          name: (meta.filename || `Bot ${botId}`).replace(/\.[^/.]+$/, ""),
+          chunks: stats.namespaces[botId].recordCount || 1,
+          filenames: [meta.filename || "document"],
+          createdAt: Date.now(),
+          themeColor: "#0084C7",
+          avatarUrl: "",
+        };
+      }
+    } catch {}
+  }
+
+  return null;
 }
 
 export async function deleteBot(botId: string, userId: string): Promise<void> {
@@ -168,27 +354,29 @@ export async function deleteBot(botId: string, userId: string): Promise<void> {
         redis.zrem(`bots_by_user:${userId}`, botId),
         redis.zrem("bots_index", botId),
       ]);
-      return;
     } catch (e: any) {
       if (e.message === "Unauthorized") throw e;
-      console.warn("[db] Redis deleteBot error, using in-memory store:", e);
+      markRedisUnavailable(e);
+      console.warn("[db] Redis deleteBot error:", e);
     }
   }
+
+  const pIndex = getPineconeIndex();
+  if (pIndex) {
+    try {
+      await pIndex.namespace("__bots__").deleteOne(botId).catch(() => {});
+      await pIndex.namespace(botId).deleteAll().catch(() => {});
+    } catch {}
+  }
+
   const idx = inMemoryBots.findIndex(b => b.botId === botId && b.userId === userId);
   if (idx !== -1) inMemoryBots.splice(idx, 1);
   inMemoryStore.delete(botId);
 }
 
 export async function getUserBotCount(userId: string): Promise<number> {
-  const redis = getRedis();
-  if (redis) {
-    try {
-      return await redis.zcard(`bots_by_user:${userId}`);
-    } catch (e) {
-      console.warn("[db] Redis getUserBotCount error, using in-memory store:", e);
-    }
-  }
-  return inMemoryBots.filter(b => b.userId === userId).length;
+  const bots = await listBots(userId);
+  return bots.length;
 }
 
 // ─── Chat Session Tracking ────────────────────────────────────────────────────
