@@ -38,7 +38,15 @@ const DEFAULT_CONFIG: BotConfig = {
 };
 
 let _redis: Redis | null = null;
+let _redisUnavailableUntil = 0;
+
+function markRedisUnavailable(err: unknown) {
+  _redisUnavailableUntil = Date.now() + 60_000;
+  console.warn("[db] Redis unreachable, disabling for 60s:", (err as any)?.message || err);
+}
+
 function getRedis() {
+  if (Date.now() < _redisUnavailableUntil) return null;
   if (!_redis) {
     if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
       _redis = new Redis({
@@ -64,6 +72,7 @@ export async function getBotConfig(botId: string): Promise<BotConfig> {
       const config = await redis.get<BotConfig>(`bot_config:${botId}`);
       return { ...DEFAULT_CONFIG, ...(config || {}) };
     } catch (e) {
+      markRedisUnavailable(e);
       console.warn("[db] Redis getBotConfig error, using in-memory store:", e);
     }
   }
@@ -91,6 +100,7 @@ export async function setBotConfig(botId: string, userId: string, config: Partia
       return;
     } catch (e: any) {
       if (e.message === "Unauthorized") throw e;
+      markRedisUnavailable(e);
       console.warn("[db] Redis setBotConfig error, using in-memory store:", e);
     }
   }
@@ -107,6 +117,7 @@ export async function registerBot(bot: BotRecord): Promise<void> {
       await redis.zadd(`bots_by_user:${bot.userId}`, { score: bot.createdAt, member: bot.botId });
       return;
     } catch (e) {
+      markRedisUnavailable(e);
       console.warn("[db] Redis registerBot error, using in-memory store:", e);
     }
   }
@@ -124,6 +135,7 @@ export async function listBots(userId: string): Promise<BotRecord[]> {
       const records = await redis.mget<BotRecord[]>(...keys);
       return records.filter((r): r is BotRecord => r !== null);
     } catch (e) {
+      markRedisUnavailable(e);
       console.warn("[db] Redis listBots error, using in-memory store:", e);
     }
   }
@@ -136,6 +148,7 @@ export async function getBot(botId: string): Promise<BotRecord | null> {
     try {
       return await redis.get<BotRecord>(`bot_record:${botId}`);
     } catch (e) {
+      markRedisUnavailable(e);
       console.warn("[db] Redis getBot error, using in-memory store:", e);
     }
   }

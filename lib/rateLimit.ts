@@ -86,6 +86,8 @@ function inProcessCheck(
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+let _upstashUnavailableUntil = 0;
+
 export async function checkRateLimit(
   identifier: string,
   limit = 30,
@@ -95,11 +97,12 @@ export async function checkRateLimit(
     process.env.UPSTASH_REDIS_REST_URL &&
     process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (hasUpstash) {
+  if (hasUpstash && Date.now() >= _upstashUnavailableUntil) {
     try {
       return await upstashCheck(identifier, limit, windowSeconds);
-    } catch (err) {
-      console.warn("[rateLimit] Upstash Redis request failed, falling back to in-memory:", err);
+    } catch (err: any) {
+      _upstashUnavailableUntil = Date.now() + 60_000;
+      console.warn("[rateLimit] Upstash Redis request failed, disabling for 60s:", err?.message || err);
       return inProcessCheck(identifier, limit, windowSeconds);
     }
   }
